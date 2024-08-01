@@ -113,3 +113,33 @@ and run first analysis
 ```
 
 in first instance we should fix `User` model specifying the factory class.
+
+### 02: Models
+
+In this stage, we will create the following models:
+
+- **Speaker:** A model to store speaker information.
+- **Talk:** A model to store talk information.
+- **TalkCategory:** A model to store talk TalkCategory information.
+- **Conference:** A model to store conference information.
+- **Venue:** A model to store venue information.
+
+Pivot model:
+
+- **ConferenceTalk:** A pivot model to store the relationship between conferences and talks.
+
+```mermaid  
+erDiagram
+    SPEAKER ||--o{ TALK: ""
+    TALK ||--|| TALK_CATEGORY: ""
+    CONFERENCE ||--|| VENUE: ""
+    TALK ||--o{ CONFERENCE_TALK: ""
+    CONFERENCE ||--o{ CONFERENCE_TALK: ""  
+```  
+
+For local development, we have created factories and seeders for each model.
+
+```bash  
+php artisan migrate:fresh --seed
+```  
+  
