@@ -181,4 +181,52 @@ If you run the database seeders, you don't need to create a new user.
 
 Now you can access the Filament admin panel at `/admin`.
 
+  
+### 04: Filament - Resources  
 
+In this stage, we will create the following resources:
+- **SpeakerResource:** A resource to manage speaker information.  
+- **TalkResource:** A resource to manage talk information.  
+- **TalkCategoryResource:** A resource to manage talk TalkCategory information.  
+- **ConferenceResource:** A resource to manage conference information.  
+- **VenueResource:** A resource to manage venue information.  
+
+Resources are static classes that are used to build CRUD interfaces for your Eloquent models. They describe how 
+administrators should be able to interact with data from your app - using tables and forms.
+
+Filament can automatically generate the form and the table of each resource. It allows you to speed up the development. 
+The focus of this talk and this demo project is "Rapid Application Development with Laravel".
+
+To create the resources, we will use the following command:
+  
+```bash  
+php artisan make:filament-resource Venue --generate  
+php artisan make:filament-resource Conference --generate  
+php artisan make:filament-resource TalkCategory --generate  
+php artisan make:filament-resource Talk --generate  
+php artisan make:filament-resource Speaker --generate  
+```
+
+The `--generate` flag asks Filament to generate the form and the table for the resource. For each resource this will 
+create serveral files in the `app/Filament/Resources` directory:
+
+E.g.:
+```
+app
+├── Filament\
+│         └── Resources\
+│             ├── ConferenceResource\
+│             │         └── Pages\
+│             │             ├── CreateConference.php
+│             │             ├── EditConference.php
+│             │             └── ListConferences.php
+│             ├── ConferenceResource.php
+```
+
+The resource lives in `ConferenceResource.php`. The classes in the `Pages` directory are used to customize the pages in
+the app that interact with the resource.  All these pages are full-page Livewire components and are fully customizable.
+
+It's important to note that Filament resources adhere to Laravel's authorization policies, ensuring that user 
+interactions are secure and within the boundaries set by your application's access controls.
+
+For more information: [Filament Panel Builder - Resources - Get Started](https://filamentphp.com/docs/3.x/panels/resources/getting-started)
