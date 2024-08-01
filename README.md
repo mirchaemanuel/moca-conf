@@ -142,4 +142,43 @@ For local development, we have created factories and seeders for each model.
 ```bash  
 php artisan migrate:fresh --seed
 ```  
-  
+
+### 03: Filament Panel Builder
+
+Filament Panel Builder is a package that allows you to create custom admin 
+panels for your Laravel applications: Panels are the top-level container 
+in Filament, allowing you to build feature-rich admin panels that include 
+pages, resources, forms, tables, notifications, actions, infolists, and 
+widgets
+
+In this stage, we will install Filament and set up the project.
+
+See the official docs for more information: 
+[Filament Panel Builder](https://filamentphp.com/docs/3.x/panels/installation)
+
+```bash
+composer require filament/filament:"^3.2" -W
+ 
+php artisan filament:install --panels
+
+# choose "admin" as ID
+````
+
+This will create and register a new Laravel service provider called
+`app/Providers/Filament/AdminPanelProvider.php`.
+
+The Filament Panel Builder pre-installs the Form Builder, Table Builder,
+Notifications, Actions, Infolists, and Widgets packages. No other
+installation steps are required to use these packages within a panel.
+
+You can create a Filament User with this command:
+
+```bash
+php artisan make:filament-user
+```
+
+If you run the database seeders, you don't need to create a new user.
+
+Now you can access the Filament admin panel at `/admin`.
+
+
