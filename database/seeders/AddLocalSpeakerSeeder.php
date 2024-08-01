@@ -14,7 +14,7 @@ class AddLocalSpeakerSeeder extends Seeder
      */
     public function run(): void
     {
-        if (App::environment() === 'local') {
+        if (App::environment() === 'local' && Speaker::count() === 0) {
             // create a bunch of category
             TalkCategory::factory()->count(10)->create();
 

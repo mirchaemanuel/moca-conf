@@ -13,7 +13,7 @@ class AddLocalTestUserSeeder extends Seeder
      */
     public function run(): void
     {
-        if (App::environment() === 'local') {
+        if (App::environment() === 'local' && User::find(1) === null) {
             $user = User::factory()->create([
                 'name' => 'Test User',
                 'email' => 'm@a80.it',
