@@ -230,3 +230,17 @@ It's important to note that Filament resources adhere to Laravel's authorization
 interactions are secure and within the boundaries set by your application's access controls.
 
 For more information: [Filament Panel Builder - Resources - Get Started](https://filamentphp.com/docs/3.x/panels/resources/getting-started)
+
+#### DemoCommand
+
+I created a console command to simplify the demo of the application. In this stage the command has four options:
+- run a fresh migration
+- run a fresh migration with seeders
+- seed the database
+- create a demo user.
+
+To run the command:
+
+```bash
+php artisan mc:demo
+```
