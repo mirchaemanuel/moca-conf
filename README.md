@@ -251,3 +251,58 @@ For brevity in this demo project, we will disable Laravel's mass assignment prot
 to models so the models can be unguarded safely.
 
 For more information: [Eloquent Mass Assignment](https://laravel.com/docs/11.x/eloquent#mass-assignment)
+
+### 05: Filament - Vite Hot Reload
+
+I configure Vite to use hot reload in the Filament admin panel. Vite is a build tool that aims to provide a faster and
+more reliable development experience for modern web projects.
+
+We are focused on Rapid Application Development with Laravel and Filament, so we want to speed up the development process.
+
+I have installed and configured Vite in stage 01. Now I will configure Vite to use hot reload in the Filament admin panel.
+
+The `vite.config.js` must be edited to include the `app/Filament` directory in the `refresh` array:
+
+```javascript
+import { defineConfig } from 'vite';
+import laravel, { refreshPaths } from 'laravel-vite-plugin';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+            ],
+            refresh: [
+                ...refreshPaths,
+                'app/Livewire/**',
+                'app/Filament/**', // <-- Add this line
+            ],
+        }),
+    ],
+});
+```
+
+Then we instruct the `AdminPanelProvider` to use the Vite server in the `register` method:
+
+```php
+use Filament\Support\Facades\FilamentView;
+use Illuminate\Support\Facades\Blade;
+
+// ...
+
+public function register(): void  
+{  
+    parent::register();  
+    FilamentView::registerRenderHook('panels::body.end', fn(): string => Blade::render("@vite('resources/js/app.js')"));  
+}
+```
+
+Now, when you run the Vite server, the Filament admin panel will use hot reload.
+
+```bash
+bun run dev
+#or
+npm run dev
+```
