@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App;
+use Illuminate\Support\Facades\App;
 use App\Models\Conference;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +13,7 @@ class AddLocalConferenceSeeder extends Seeder
      */
     public function run(): void
     {
-        if (App::environment('local')) {
+        if (App::environment('local') && Conference::count() === 0) {
             Conference::factory()->count(5)->create();
         }
     }

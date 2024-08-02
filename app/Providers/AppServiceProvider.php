@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        /**
+         * For brevity in this demo project, we will disable Laravel's mass assignment protection.
+         * Filament only saves valid data to models so the models can be unguarded safely
+         */
+        Model::unguard();
     }
 }
