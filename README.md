@@ -244,3 +244,10 @@ To run the command:
 ```bash
 php artisan mc:demo
 ```
+
+#### Unguarding all models
+
+For brevity in this demo project, we will disable Laravel's mass assignment protection. Filament only saves valid data
+to models so the models can be unguarded safely.
+
+For more information: [Eloquent Mass Assignment](https://laravel.com/docs/11.x/eloquent#mass-assignment)
