@@ -306,3 +306,116 @@ bun run dev
 #or
 npm run dev
 ```
+
+### 06: Filament - Form Inputs
+
+#### Country List
+
+I've choosen to install `monarobase/country-list` package to provide a list of countries in the form:
+
+```bash
+composer require monarobase/country-list
+```
+
+In Tinker you can test the package:
+
+```bash
+php artisan tinker
+```
+
+and then
+
+```php
+Countries::getList(app()->getLocale())
+```
+
+#### Basic Form Inputs
+
+FilamentPHP offers a Form Builder package. The Form Builder package is pre-installed with the Panel Builder and allows
+to easily build dynamic forms in the app.
+
+In stage `04: Filament - Resources` we have created the resources with the `--generate` flag. Filament has created
+these resources with complete functional forms and tables. In this stage, we will go deeper into the form fields to
+customize them.
+
+For more information about Form Buiolder: [Filament Panel Builder - Form Builder](https://filamentphp.com/docs/3.x/forms/getting-started).
+
+##### Form Schemas
+
+The form schema is a static method that returns an array of fields and layout components. Fields are the inputs that your 
+user will fill their data into. Layout components are used to group fields together, and to control how they are displayed.
+
+E.g. `TalkResource.php` form schema:
+
+```php
+public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Select::make('speaker_id')
+                    ->relationship('speaker', 'id')
+                    ->required(),
+                Forms\Components\Select::make('talk_category_id')
+                    ->relationship('talkCategory', 'name')
+                    ->required(),
+                Forms\Components\TextInput::make('title')
+                    ->required(),
+                Forms\Components\Textarea::make('abstract')
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('description')
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('type')
+                    ->required(),
+                Forms\Components\TextInput::make('duration')
+                    ->required()
+                    ->numeric()
+                    ->default(30),
+                Forms\Components\TextInput::make('status')
+                    ->required(),
+            ]);
+    }
+```
+
+##### Form Fields
+
+Filament provides a wide range of form fields to choose from. Each field has a set of methods that can be chained to
+customize the field's behavior and appearance.
+
+Fields:
+- Text Input
+- Select
+- Checkbox
+- Toggle
+- Checkbox list
+- Radio
+- Date-time picker
+- Rich editor
+- Markdown editor
+- File upload
+- Repeater
+- Bulder
+- Tags input
+- Textarea
+- Key-value
+- Color picker
+- Toggle buttons
+- Hidden
+- Custom fields
+
+##### Layout Components
+
+Layout components are used to group fields together, and to control how they are displayed. Filament provides a range of
+layout components to choose from.
+
+Layout components:
+- Grid
+- Fieldset
+- Tabs
+- Wizard
+- Section
+- Split
+- Custom layouts
+- Placeholder
+
