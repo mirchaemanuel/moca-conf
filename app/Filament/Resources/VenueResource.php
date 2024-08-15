@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VenueResource\Pages;
 use App\Models\Venue;
+use Countries;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -20,18 +21,35 @@ class VenueResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\TextInput::make('address')
-                    ->required(),
-                Forms\Components\TextInput::make('city')
-                    ->required(),
-                Forms\Components\TextInput::make('state')
-                    ->required(),
-                Forms\Components\TextInput::make('zip')
-                    ->required(),
-                Forms\Components\TextInput::make('country')
-                    ->required(),
+                Forms\Components\Section::make(__('General Information'))
+                    ->icon('heroicon-o-information-circle')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\Section::make(__('Location'))
+                    ->description(__('Address information for this venue.'))
+                    ->icon('heroicon-o-map')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('address')
+                            ->columnSpanFull()
+                            ->required(),
+                        Forms\Components\TextInput::make('city')
+                            ->required(),
+                        Forms\Components\TextInput::make('state')
+                            ->required(),
+                        Forms\Components\TextInput::make('zip')
+                            ->required(),
+                        Forms\Components\Select::make('country')
+                            ->placeholder(__('Select a country'))
+                            ->searchable()
+                            ->options(
+                                Countries::getList(app()->getLocale())
+                            )
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -83,9 +101,9 @@ class VenueResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVenues::route('/'),
+            'index'  => Pages\ListVenues::route('/'),
             'create' => Pages\CreateVenue::route('/create'),
-            'edit' => Pages\EditVenue::route('/{record}/edit'),
+            'edit'   => Pages\EditVenue::route('/{record}/edit'),
         ];
     }
 }

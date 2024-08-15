@@ -306,3 +306,131 @@ bun run dev
 #or
 npm run dev
 ```
+
+### 06: Filament - Form Inputs
+
+In this stage I'm introducing some basic form inputs to the Filament resources. We apply the following form inputs to the
+Venue resource, the simplest resource in the application. In next stages, after I introduced tables, actions and relations,
+we will apply these form inputs to the other resources.
+
+#### Country List
+
+I've choosen to install `monarobase/country-list` package to provide a list of countries in the form:
+
+```bash
+composer require monarobase/country-list
+```
+
+In Tinker you can test the package:
+
+```bash
+php artisan tinker
+```
+
+and then
+
+```php
+Countries::getList(app()->getLocale())
+```
+
+#### Basic Form Inputs
+
+FilamentPHP offers a Form Builder package. The Form Builder package is pre-installed with the Panel Builder and allows
+to easily build dynamic forms in the app.
+
+In stage `04: Filament - Resources` we have created the resources with the `--generate` flag. Filament has created
+these resources with complete functional forms and tables. In this stage, we will go deeper into the form fields to
+customize them.
+
+For more information about Form Buiolder: [Filament Panel Builder - Form Builder](https://filamentphp.com/docs/3.x/forms/getting-started).
+
+##### Form Schemas
+
+The form schema is a static method that returns an array of fields and layout components. Fields are the inputs that your 
+user will fill their data into. Layout components are used to group fields together, and to control how they are displayed.
+
+E.g. `VenueResource.php` form schema:
+
+```php
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Section::make(__('General Information'))
+                    ->icon('heroicon-o-information-circle')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\Section::make(__('Location'))
+                    ->description(__('Address information for this venue.'))
+                    ->icon('heroicon-o-map')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('address')
+                            ->columnSpanFull()
+                            ->required(),
+                        Forms\Components\TextInput::make('city')
+                            ->required(),
+                        Forms\Components\TextInput::make('state')
+                            ->required(),
+                        Forms\Components\TextInput::make('zip')
+                            ->required(),
+                        Forms\Components\Select::make('country')
+                            ->placeholder(__('Select a country'))
+                            ->searchable()
+                            ->options(
+                                Countries::getList(app()->getLocale())
+                            )
+                            ->required(),
+                    ]),
+            ]);
+    }
+```
+
+##### Form Fields
+
+Filament provides a wide range of form fields to choose from. Each field has a set of methods that can be chained to
+customize the field's behavior and appearance.
+
+Fields:
+- Text Input
+- Select
+- Checkbox
+- Toggle
+- Checkbox list
+- Radio
+- Date-time picker
+- Rich editor
+- Markdown editor
+- File upload
+- Repeater
+- Bulder
+- Tags input
+- Textarea
+- Key-value
+- Color picker
+- Toggle buttons
+- Hidden
+- Custom fields
+
+##### Layout Components
+
+Layout components are used to group fields together, and to control how they are displayed. Filament provides a range of
+layout components to choose from.
+
+Layout components:
+- Grid
+- Fieldset
+- Tabs
+- Wizard
+- Section
+- Split
+- Custom layouts
+- Placeholder
+
+#### Venue form result
+![VenueResource.png](/docs/images/VenueResource.png)
+
+
