@@ -40,6 +40,7 @@ class VenueResource extends Resource
                         Forms\Components\TextInput::make('zip')
                             ->required(),
                         Forms\Components\Select::make('country')
+                            ->placeholder(__('Select a country'))
                             ->searchable()
                             ->options(
                                 Countries::getList(app()->getLocale())
