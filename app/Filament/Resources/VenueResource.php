@@ -21,14 +21,17 @@ class VenueResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Fieldset::make(__('General Information'))
-                    ->columns(2)
+                Forms\Components\Section::make(__('General Information'))
+                    ->icon('heroicon-o-information-circle')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->columnSpanFull(),
                     ]),
-                Forms\Components\Fieldset::make(__('Location'))
+                Forms\Components\Section::make(__('Location'))
+                    ->description(__('Address information for this venue.'))
+                    ->icon('heroicon-o-map')
+                    ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('address')
                             ->columnSpanFull()
