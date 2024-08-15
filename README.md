@@ -309,6 +309,10 @@ npm run dev
 
 ### 06: Filament - Form Inputs
 
+In this stage I'm introducing some basic form inputs to the Filament resources. We apply the following form inputs to the
+Venue resource, the simplest resource in the application. In next stages, after I introduced tables, actions and relations,
+we will apply these form inputs to the other resources.
+
 #### Country List
 
 I've choosen to install `monarobase/country-list` package to provide a list of countries in the form:
@@ -345,35 +349,42 @@ For more information about Form Buiolder: [Filament Panel Builder - Form Builder
 The form schema is a static method that returns an array of fields and layout components. Fields are the inputs that your 
 user will fill their data into. Layout components are used to group fields together, and to control how they are displayed.
 
-E.g. `TalkResource.php` form schema:
+E.g. `VenueResource.php` form schema:
 
 ```php
-public static function form(Form $form): Form
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('speaker_id')
-                    ->relationship('speaker', 'id')
-                    ->required(),
-                Forms\Components\Select::make('talk_category_id')
-                    ->relationship('talkCategory', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('title')
-                    ->required(),
-                Forms\Components\Textarea::make('abstract')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('type')
-                    ->required(),
-                Forms\Components\TextInput::make('duration')
-                    ->required()
-                    ->numeric()
-                    ->default(30),
-                Forms\Components\TextInput::make('status')
-                    ->required(),
+                Forms\Components\Section::make(__('General Information'))
+                    ->icon('heroicon-o-information-circle')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\Section::make(__('Location'))
+                    ->description(__('Address information for this venue.'))
+                    ->icon('heroicon-o-map')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('address')
+                            ->columnSpanFull()
+                            ->required(),
+                        Forms\Components\TextInput::make('city')
+                            ->required(),
+                        Forms\Components\TextInput::make('state')
+                            ->required(),
+                        Forms\Components\TextInput::make('zip')
+                            ->required(),
+                        Forms\Components\Select::make('country')
+                            ->placeholder(__('Select a country'))
+                            ->searchable()
+                            ->options(
+                                Countries::getList(app()->getLocale())
+                            )
+                            ->required(),
+                    ]),
             ]);
     }
 ```
@@ -418,4 +429,8 @@ Layout components:
 - Split
 - Custom layouts
 - Placeholder
+
+#### Venue form result
+![VenueResource.png](/docs/images/VenueResource.png)
+
 
