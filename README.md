@@ -433,4 +433,93 @@ Layout components:
 #### Venue form result
 ![VenueResource.png](/docs/images/VenueResource.png)
 
+### 07: Filament - Table Builder Basics
 
+FilamentPHP offers a Table Builder package. The Table Builder package is pre-installed with the Panel Builder and allows
+to easily build dynamic tables in the app. 
+
+In stage `04: Filament - Resources` we have created the resources with the `--generate` flag. Filament has created
+these resources with complete functional forms and **tables**. In this stage, we will go deeper into the table builder to
+customize them.
+
+For more information [Filament Table Builder](https://filamentphp.com/docs/3.x/tables/getting-started).
+
+#### Table Columns
+
+The basis of any table is rows and columns. Filament uses Eloquent to get the data for rows in the table, and you are 
+responsible for defining the columns that are used in that row.
+
+Filament includes many column types prebuilt for you.
+
+Columns are stored in an array, as objects within the $table->columns() method:
+
+E.g. `VenueResource.php` form schema:
+
+```php
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('address')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('city')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('state')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('zip')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('country')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+//...
+        ;
+```
+
+##### Column Types:
+
+Filament ships with two main types of columns - static and editable.
+- Text column
+- Icon column
+- Image column
+- Color column
+- Select column
+- Toggle column
+- Text input column
+- Checkbox column
+
+You can also create custom columns.
+
+Each column can be customized to be sortable, searchable, hidden by default, ...
+
+#### Table Filters
+
+Filament allows you to define table filters to help users quickly find the data they need. Filters can be added to any
+table to provide a more interactive and user-friendly experience. These filters can be based on various criteria, such
+as text, date ranges, or custom logic. By using filters, you can enhance the usability of your tables, making it easier 
+for users to navigate and manage large datasets efficiently.
+
+For more information [Filament Table Builder - Filters](https://filamentphp.com/docs/3.x/tables/filters/getting-started)
+
+E.g. search filter for country column of VenueResource:
+
+```php
+//...
+->filters([
+    SelectFilter::make('country')
+        ->multiple()
+        ->searchable()
+        ->options(Countries::getList(app()->getLocale())),
+])
+//...
+```
+
+#### Venue table result
+![VenueResource_table_07.png](/docs/images/VenueResource_table_07.png)
