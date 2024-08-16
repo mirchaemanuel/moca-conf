@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class VenueResource extends Resource
@@ -58,16 +59,22 @@ class VenueResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('city')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('state')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('zip')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('country')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -79,7 +86,10 @@ class VenueResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('country')
+                    ->multiple()
+                    ->searchable()
+                    ->options(Countries::getList(app()->getLocale())),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
