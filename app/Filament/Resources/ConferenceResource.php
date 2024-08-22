@@ -4,11 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ConferenceResource\Pages;
 use App\Models\Conference;
+use App\Models\Venue;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class ConferenceResource extends Resource
 {
@@ -20,21 +23,44 @@ class ConferenceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('venue_id')
-                    ->relationship('venue', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\TextInput::make('slug')
-                    ->required(),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('start_date')
-                    ->required(),
-                Forms\Components\DateTimePicker::make('end_date')
-                    ->required(),
+                Forms\Components\Section::make(__('General Information'))
+                    ->icon('heroicon-o-information-circle')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('venue_id')
+                            ->relationship('venue', 'name')
+                            ->columnSpanFull()
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm(
+                                VenueResource::getFormSchema()
+                            )
+                            ->getOptionLabelFromRecordUsing(fn(Venue $venue): string => "{$venue->name} - {$venue->city} ({$venue->state}) - {$venue->country}")
+                            ->required(),
+                        Forms\Components\TextInput::make('name')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state ?? '')))
+                            ->required(),
+                        Forms\Components\TextInput::make('slug')
+                            ->required(),
+                        Forms\Components\MarkdownEditor::make('description')
+                            ->disableToolbarButtons([
+                                'attachFiles'
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\Section::make(__('Dates'))
+                    ->icon('heroicon-o-calendar-date-range')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\DateTimePicker::make('start_date')
+                            ->required(),
+                        Forms\Components\DateTimePicker::make('end_date')
+                            ->required(),
+                    ]),
                 Forms\Components\TextInput::make('status')
                     ->required(),
+
             ]);
     }
 
@@ -89,9 +115,9 @@ class ConferenceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListConferences::route('/'),
+            'index'  => Pages\ListConferences::route('/'),
             'create' => Pages\CreateConference::route('/create'),
-            'edit' => Pages\EditConference::route('/{record}/edit'),
+            'edit'   => Pages\EditConference::route('/{record}/edit'),
         ];
     }
 }

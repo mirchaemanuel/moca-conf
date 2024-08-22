@@ -523,3 +523,97 @@ E.g. search filter for country column of VenueResource:
 
 #### Venue table result
 ![VenueResource_table_07.png](/docs/images/VenueResource_table_07.png)
+
+
+### 08: Filament - Conference Resource
+
+In this stage, I'm applying the form inputs and table builder to the Conference resource.
+
+#### Select Input - Creating new option
+
+Filament allows you to create new options for a select input. This is useful when you want to add a new option to a select
+input without leaving the form.
+
+```php
+Forms\Components\Select::make('venue_id')
+                    ->relationship('venue', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm(
+                       // ...  
+                    )
+                    ->required(),
+```
+
+Inside `createOptionForm` method you can define the form fields to create a new Venue. To avoid duplication, I extracted
+the Venue form schema to a separate method and used it in the Conference form schema.
+
+```php
+Forms\Components\Select::make('venue_id')
+                    ->relationship('venue', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm(
+                        VenueResource::getFormSchema()
+                    )
+                    ->required(),
+```
+
+#### Select - customizing the relationship option labels
+
+We can use `getOptionLabelFromRecordUsing` method to customize the option labels in a select input.
+
+```php
+ Forms\Components\Select::make('venue_id')
+                            //...
+                            ->getOptionLabelFromRecordUsing(
+                                fn(Venue $venue): string => "{$venue->name} - {$venue->city} ({$venue->state}) - {$venue->country}"
+                                )
+                            ->required(),
+```
+
+#### Reactive Fields - Generating Slug
+
+Filament allows you to create reactive fields. Reactive fields are fields that automatically update based on the value of
+another field. This is useful when you want to generate a value based on another field's value.
+
+In Conference resource we want to generate a slug based on the conference name.
+
+I marked the `name` field as reactive adding the `->live()` method.
+
+```php 
+Forms\Components\TextInput::make('name')
+     ->live(onBlur: true)
+```
+
+By default, when a field is set to live(), the form will re-render every time the field is interacted with. This can be
+changed by passing a boolean value to the live() method: `onBlur: true`. This will only re-render the form when the field
+loses focus.
+
+Then I used the `afterStateUpdated` method to customize what happens after a field is updated by the user.
+
+```php
+ Forms\Components\TextInput::make('name')
+    ->live(onBlur: true)
+    ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state ?? '')))
+    ->required(),
+```
+
+When the user types in the `name` field, the `slug` field will automatically update with the slug of the name.
+
+#### Markdown Editor
+
+Filament provides rich text editor and markdown editor fields. These fields allow you to add rich text and markdown
+content to your forms.
+
+We desire the `description` of the `Conference` to be rendered in markdown. So I used the `MarkdownEditor` field.
+
+```php
+Forms\Components\TextInput::make('slug')
+    ->disableToolbarButtons([
+        'attachFiles'
+    ])
+    ->required(),
+```
+
+The `MarkdownEditor` can be customized enabling or disabling buttons in the toolbar.
