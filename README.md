@@ -713,4 +713,16 @@ In this stage, I'm applying the form inputs and table builder to the Speaker res
 complex resource in the application. It has a many-to-many relationship with the Talk resource. The Speaker form has also
 a file upload field to upload the speaker's photo.
 
+#### Icons set
+
+Filament has preinstalled the Heroicons set. You can use these icons in your resources. I'm installing also the
+`bootstrap-icons` package to have more icons available.
+
+```bash
+composer require davidhsianturi/blade-bootstrap-icons
+```
+
+Remember to execute `composer install` after pulling the repository in this stage.
+
+![speaker_social_section.png](/docs/images/speaker_social_section.png)
 

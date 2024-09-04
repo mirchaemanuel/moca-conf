@@ -55,13 +55,21 @@ class SpeakerResource extends Resource
                             ->tel(),
                     ]),
                 Forms\Components\Section::make(__('Social'))
-                    ->icon('heroicon-s-user-group')
+                    ->icon('bi-link-45deg')
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('linkedin')->url(),
-                        Forms\Components\TextInput::make('twitter')->url(),
-                        Forms\Components\TextInput::make('facebook')->url(),
-                        Forms\Components\TextInput::make('instagram')->url(),
+                        Forms\Components\TextInput::make('linkedin')
+                            ->prefixicon('bi-linkedin')
+                            ->url(),
+                        Forms\Components\TextInput::make('twitter')
+                            ->prefixicon('bi-twitter-x')
+                            ->url(),
+                        Forms\Components\TextInput::make('facebook')
+                            ->prefixicon('bi-facebook')
+                            ->url(),
+                        Forms\Components\TextInput::make('instagram')
+                            ->prefixicon('bi-instagram')
+                            ->url(),
                     ]),
                 Forms\Components\Section::make(__('Internal Information'))
                     ->icon('heroicon-o-ellipsis-horizontal')
