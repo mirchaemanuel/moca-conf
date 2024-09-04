@@ -802,4 +802,66 @@ create a flexible two columns layout for the Speaker form.
 The result:
 ![speaker_split_section.png](/docs/images/speaker_split_section.png)
 
+#### Table tidying
 
+Let's tidy up the Speaker table.
+
+##### Image Column
+
+Images can be easily displayed within your table:
+
+```php
+use Filament\Tables\Columns\ImageColumn;
+ 
+ImageColumn::make('avatar')
+```
+
+I added the `avatar` column to the Speaker table with these options:
+
+```php
+Tables\Columns\ImageColumn::make('avatar')
+    ->toggleable(isToggledHiddenByDefault: false)
+    ->height(120)
+    ->circular(),
+```
+
+
+#### Adding country column to the Speaker model
+
+I've found useful to add the `country` attribute to the Speaker model. So, I'm adding a new migration to add the
+`country` column to the `speakers` table.
+
+```bash
+php artisan make:migration add_country_to_speakers_table
+```
+
+```php
+public function up()
+{
+    Schema::table('speakers', function (Blueprint $table) {
+        $table->string('country')->nullable()->after('last_name');
+    });
+}
+```
+
+Then I'm updating the Speaker resource to include the `country` field in the form and the table.
+
+```php
+Forms\Components\Select::make('country')
+    ->placeholder(__('Select a country'))
+    ->searchable()
+    ->options(
+        Countries::getList(app()->getLocale())
+    ),
+```
+
+```php
+Tables\Columns\TextColumn::make('country')
+    ->searchable(),
+```
+
+Remember to run the migration:
+
+```bash
+php artisan migrate
+```

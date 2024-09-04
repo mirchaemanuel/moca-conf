@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SpeakerResource\Pages;
 use App\Models\Speaker;
+use Countries;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
@@ -35,6 +36,12 @@ class SpeakerResource extends Resource
                                 Forms\Components\TextInput::make('last_name')
                                     ->required(),
                                 Forms\Components\TextInput::make('nickname'),
+                                Forms\Components\Select::make('country')
+                                    ->placeholder(__('Select a country'))
+                                    ->searchable()
+                                    ->options(
+                                        Countries::getList(app()->getLocale())
+                                    ),
                             ])->columns(2),
                             Section::make([
                                 FileUpload::make('avatar')
@@ -103,27 +110,29 @@ class SpeakerResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->height(120)
+                    ->circular(),
                 Tables\Columns\TextColumn::make('first_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nickname')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('country')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('company')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('job_title')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('linkedin')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('twitter')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('facebook')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('instagram')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
