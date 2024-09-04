@@ -705,3 +705,181 @@ Tables\Columns\TextColumn::make('status')
 
 The result of the table is:
 ![ConferenceResource_table_08.png](/docs/images/ConferenceResource_table_08.png)
+
+
+### 09 Filament - Speaker Resource
+
+In this stage, I'm applying the form inputs and table builder to the Speaker resource. The Speaker resource is the most
+complex resource in the application. It has a many-to-many relationship with the Talk resource. The Speaker form has also
+a file upload field to upload the speaker's photo.
+
+#### Icons set
+
+Filament has preinstalled the Heroicons set. You can use these icons in your resources. I'm installing also the
+`bootstrap-icons` package to have more icons available.
+
+```bash
+composer require davidhsianturi/blade-bootstrap-icons
+```
+
+Remember to execute `composer install` after pulling the repository in this stage.
+
+![speaker_social_section.png](/docs/images/speaker_social_section.png)
+
+#### File Upload - Avatar field
+
+The Speaker resource has a file upload field to upload the speaker's photo. The file upload field is a simple way to
+upload files to your server. The file upload field can be customized to accept specific file types, sizes, and more.
+
+For more information [Filament Form Builder - File Upload](https://filamentphp.com/docs/3.x/forms/fields/file-upload)
+
+Base usage:
+
+```php
+FileUpload::make('avatar')
+```
+
+By default, files will be uploaded publicly to your storage disk defined in the configuration file. You can specify the 
+disk and/or the directory.
+
+To enable the public storage disk, you need to create a symbolic link from `public/storage` to `storage/app/public`. You
+can use the `storage:link` Artisan command to create this symbolic link.
+
+```bash
+php artisan storage:link
+```
+
+##### File Upload - advanced options
+
+The file upload field can be customized to accept specific file types, sizes, and more. You can enable:
+- multiple files upload
+- accept specific file types
+- set the maximum file size
+- controlling or preserving the original file name
+- set the upload directory
+- use external storage (like S3)
+- enable the avatar mode
+- enable an integrated image editor.
+
+In our case, we want to upload only images, enable the avatar mode and the image editor to allow the user to crop the
+image.
+
+```php
+FileUpload::make('avatar')
+    ->avatar()
+    ->directory('avatars')
+    ->imageEditor()
+    ->maxSize(1024 * 1024 * 10),
+```
+
+#### Split Layout
+
+The Split component allows you to define layouts with flexible widths, using flexbox. I've used the Split component to
+create a flexible two columns layout for the Speaker form.
+
+```php
+ Split::make([
+      Section::make([
+          Forms\Components\TextInput::make('first_name')
+              ->required(),
+          Forms\Components\TextInput::make('last_name')
+              ->required(),
+          Forms\Components\TextInput::make('nickname'),
+      ])->columns(2),
+      Section::make([
+          FileUpload::make('avatar')
+              ->avatar()
+              ->directory('avatars')
+              ->imageEditor()
+              ->maxSize(1024 * 1024 * 10)
+              ->columnSpanFull(),
+      ])->grow(false),
+  ])
+      ->from('md')
+      ->columnSpanFull(),
+```
+
+The result:
+![speaker_split_section.png](/docs/images/speaker_split_section.png)
+
+#### Table tidying
+
+Let's tidy up the Speaker table.
+
+##### Image Column
+
+Images can be easily displayed within your table:
+
+```php
+use Filament\Tables\Columns\ImageColumn;
+ 
+ImageColumn::make('avatar')
+```
+
+I added the `avatar` column to the Speaker table with these options:
+
+```php
+Tables\Columns\ImageColumn::make('avatar')
+    ->toggleable(isToggledHiddenByDefault: false)
+    ->height(120)
+    ->circular(),
+```
+
+
+#### Adding country column to the Speaker model
+
+I've found useful to add the `country` attribute to the Speaker model. So, I'm adding a new migration to add the
+`country` column to the `speakers` table.
+
+```bash
+php artisan make:migration add_country_to_speakers_table
+```
+
+```php
+public function up()
+{
+    Schema::table('speakers', function (Blueprint $table) {
+        $table->string('country')->nullable()->after('last_name');
+    });
+}
+```
+
+Then I'm updating the Speaker resource to include the `country` field in the form and the table.
+
+```php
+Forms\Components\Select::make('country')
+    ->placeholder(__('Select a country'))
+    ->searchable()
+    ->options(
+        Countries::getList(app()->getLocale())
+    ),
+```
+
+```php
+Tables\Columns\TextColumn::make('country')
+    ->searchable(),
+```
+
+Remember to run the migration:
+
+```bash
+php artisan migrate
+```
+
+#### Table Filters: country
+
+I've added a filter to filter the speakers by country. The filter is a select input with the options based on the
+`Country` list.
+
+```php
+ SelectFilter::make('country')
+     ->multiple()
+     ->searchable()
+     ->preload()
+     ->options(
+         Countries::getList(app()->getLocale())
+     ),
+```
+
+The result:
+![speaker_table_country_filter.png](/docs/images/speaker_table_country_filter.png)

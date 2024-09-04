@@ -21,6 +21,8 @@ class SpeakerFactory extends Factory
         return [
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
+            'country' => $this->faker->countryCode,
+
             'nickname' => $this->faker->userName,
 
             'avatar' => $this->faker->imageUrl(),

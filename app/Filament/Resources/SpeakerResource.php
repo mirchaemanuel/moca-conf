@@ -4,10 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SpeakerResource\Pages;
 use App\Models\Speaker;
+use Countries;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Split;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class SpeakerResource extends Resource
@@ -20,27 +25,85 @@ class SpeakerResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('first_name')
-                    ->required(),
-                Forms\Components\TextInput::make('last_name')
-                    ->required(),
-                Forms\Components\TextInput::make('nickname'),
-                Forms\Components\Textarea::make('avatar')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('bio')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('email')
-                    ->email(),
-                Forms\Components\TextInput::make('phone')
-                    ->tel(),
-                Forms\Components\TextInput::make('company'),
-                Forms\Components\TextInput::make('job_title'),
-                Forms\Components\TextInput::make('linkedin'),
-                Forms\Components\TextInput::make('twitter'),
-                Forms\Components\TextInput::make('facebook'),
-                Forms\Components\TextInput::make('instagram'),
-                Forms\Components\Textarea::make('notes')
-                    ->columnSpanFull(),
+
+                Forms\Components\Section::make(__('General Information'))
+                    ->icon('heroicon-o-user-circle')
+                    ->columns(2)
+                    ->schema([
+                        Split::make([
+                            Section::make([
+                                Forms\Components\TextInput::make('first_name')
+                                    ->required(),
+                                Forms\Components\TextInput::make('last_name')
+                                    ->required(),
+                                Forms\Components\TextInput::make('nickname'),
+                                Forms\Components\Select::make('country')
+                                    ->placeholder(__('Select a country'))
+                                    ->searchable()
+                                    ->options(
+                                        Countries::getList(app()->getLocale())
+                                    ),
+                            ])->columns(2),
+                            Section::make([
+                                FileUpload::make('avatar')
+                                    ->avatar()
+                                    ->directory('avatars')
+                                    ->imageEditor()
+                                    ->maxSize(1024 * 1024 * 10)
+                                    ->columnSpanFull(),
+                            ])->grow(false),
+                        ])
+                            ->from('md')
+                            ->columnSpanFull(),
+
+                        Forms\Components\MarkdownEditor::make('bio')
+                            ->disableToolbarButtons([
+                                'attachFiles',
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\Section::make(__('Job Information'))
+                    ->icon('heroicon-s-briefcase')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('company'),
+                        Forms\Components\TextInput::make('job_title'),
+                    ]),
+                Forms\Components\Section::make(__('Contacts'))
+                    ->icon('heroicon-o-device-phone-mobile')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('email')
+                            ->email(),
+                        Forms\Components\TextInput::make('phone')
+                            ->tel(),
+                    ]),
+                Forms\Components\Section::make(__('Social'))
+                    ->icon('bi-link-45deg')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('linkedin')
+                            ->prefixicon('bi-linkedin')
+                            ->url(),
+                        Forms\Components\TextInput::make('twitter')
+                            ->prefixicon('bi-twitter-x')
+                            ->url(),
+                        Forms\Components\TextInput::make('facebook')
+                            ->prefixicon('bi-facebook')
+                            ->url(),
+                        Forms\Components\TextInput::make('instagram')
+                            ->prefixicon('bi-instagram')
+                            ->url(),
+                    ]),
+                Forms\Components\Section::make(__('Internal Information'))
+                    ->icon('heroicon-o-ellipsis-horizontal')
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Textarea::make('notes')
+                            ->columnSpanFull(),
+                    ]),
+
+
             ]);
     }
 
@@ -48,27 +111,32 @@ class SpeakerResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->height(120)
+                    ->circular(),
                 Tables\Columns\TextColumn::make('first_name')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_name')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nickname')
+                    ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('country')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('company')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('job_title')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('linkedin')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('twitter')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('facebook')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('instagram')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -80,15 +148,19 @@ class SpeakerResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('country')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->options(
+                        Countries::getList(app()->getLocale())
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+
             ]);
     }
 
@@ -102,9 +174,9 @@ class SpeakerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSpeakers::route('/'),
+            'index'  => Pages\ListSpeakers::route('/'),
             'create' => Pages\CreateSpeaker::route('/create'),
-            'edit' => Pages\EditSpeaker::route('/{record}/edit'),
+            'edit'   => Pages\EditSpeaker::route('/{record}/edit'),
         ];
     }
 }
