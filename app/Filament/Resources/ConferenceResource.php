@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ConferenceStatus;
 use App\Filament\Resources\ConferenceResource\Pages;
 use App\Models\Conference;
 use App\Models\Venue;
@@ -23,9 +24,8 @@ class ConferenceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('General Information'))
-                    ->icon('heroicon-o-information-circle')
-                    ->columns(2)
+                Forms\Components\Section::make(__('Location'))
+                    ->icon('heroicon-o-map')
                     ->schema([
                         Forms\Components\Select::make('venue_id')
                             ->relationship('venue', 'name')
@@ -37,6 +37,11 @@ class ConferenceResource extends Resource
                             )
                             ->getOptionLabelFromRecordUsing(fn(Venue $venue): string => "{$venue->name} - {$venue->city} ({$venue->state}) - {$venue->country}")
                             ->required(),
+                    ]),
+                Forms\Components\Section::make(__('General Information'))
+                    ->icon('heroicon-o-information-circle')
+                    ->columns(2)
+                    ->schema([
                         Forms\Components\TextInput::make('name')
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state ?? '')))
@@ -58,10 +63,13 @@ class ConferenceResource extends Resource
                         Forms\Components\DateTimePicker::make('end_date')
                             ->required(),
                     ]),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Radio::make('status')
+                    ->options(
+                        ConferenceStatus::class
+                    )
                     ->required(),
-
             ]);
+
     }
 
     public static function table(Table $table): Table
@@ -74,6 +82,7 @@ class ConferenceResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('start_date')
                     ->dateTime()
@@ -81,8 +90,11 @@ class ConferenceResource extends Resource
                 Tables\Columns\TextColumn::make('end_date')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
+                Tables\Columns\IconColumn::make('status')
+                    ->icon(fn($record) => $record->status->getIcon())
+                    ->color(fn($record) => $record->status->getColor())
+                    ->tooltip(fn($record) => $record->status->value)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

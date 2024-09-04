@@ -524,7 +524,6 @@ E.g. search filter for country column of VenueResource:
 #### Venue table result
 ![VenueResource_table_07.png](/docs/images/VenueResource_table_07.png)
 
-
 ### 08: Filament - Conference Resource
 
 In this stage, I'm applying the form inputs and table builder to the Conference resource.
@@ -617,3 +616,19 @@ Forms\Components\TextInput::make('slug')
 ```
 
 The `MarkdownEditor` can be customized enabling or disabling buttons in the toolbar.
+
+#### Conference Table
+
+##### Icon Column
+
+The `Conference` table has a column `status` represented with an icon. The icon is based on the status of the conference.
+The `ConferenceStatus` enum implements these three interfaces: `HasIcon`, `HasDescription`, `HasColor` to provide icon, 
+description and color for each status.
+
+So the column definition is:
+
+```php
+ Tables\Columns\IconColumn::make('status')
+     ->icon(fn($record) => $record->status->getIcon())
+     ->color(fn($record) => $record->status->getColor()),
+```
