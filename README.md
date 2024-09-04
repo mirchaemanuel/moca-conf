@@ -726,3 +726,80 @@ Remember to execute `composer install` after pulling the repository in this stag
 
 ![speaker_social_section.png](/docs/images/speaker_social_section.png)
 
+#### File Upload - Avatar field
+
+The Speaker resource has a file upload field to upload the speaker's photo. The file upload field is a simple way to
+upload files to your server. The file upload field can be customized to accept specific file types, sizes, and more.
+
+For more information [Filament Form Builder - File Upload](https://filamentphp.com/docs/3.x/forms/fields/file-upload)
+
+Base usage:
+
+```php
+FileUpload::make('avatar')
+```
+
+By default, files will be uploaded publicly to your storage disk defined in the configuration file. You can specify the 
+disk and/or the directory.
+
+To enable the public storage disk, you need to create a symbolic link from `public/storage` to `storage/app/public`. You
+can use the `storage:link` Artisan command to create this symbolic link.
+
+```bash
+php artisan storage:link
+```
+
+##### File Upload - advanced options
+
+The file upload field can be customized to accept specific file types, sizes, and more. You can enable:
+- multiple files upload
+- accept specific file types
+- set the maximum file size
+- controlling or preserving the original file name
+- set the upload directory
+- use external storage (like S3)
+- enable the avatar mode
+- enable an integrated image editor.
+
+In our case, we want to upload only images, enable the avatar mode and the image editor to allow the user to crop the
+image.
+
+```php
+FileUpload::make('avatar')
+    ->avatar()
+    ->directory('avatars')
+    ->imageEditor()
+    ->maxSize(1024 * 1024 * 10),
+```
+
+#### Split Layout
+
+The Split component allows you to define layouts with flexible widths, using flexbox. I've used the Split component to
+create a flexible two columns layout for the Speaker form.
+
+```php
+ Split::make([
+      Section::make([
+          Forms\Components\TextInput::make('first_name')
+              ->required(),
+          Forms\Components\TextInput::make('last_name')
+              ->required(),
+          Forms\Components\TextInput::make('nickname'),
+      ])->columns(2),
+      Section::make([
+          FileUpload::make('avatar')
+              ->avatar()
+              ->directory('avatars')
+              ->imageEditor()
+              ->maxSize(1024 * 1024 * 10)
+              ->columnSpanFull(),
+      ])->grow(false),
+  ])
+      ->from('md')
+      ->columnSpanFull(),
+```
+
+The result:
+![speaker_split_section.png](/docs/images/speaker_split_section.png)
+
+

@@ -5,6 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SpeakerResource\Pages;
 use App\Models\Speaker;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Split;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -25,13 +28,26 @@ class SpeakerResource extends Resource
                     ->icon('heroicon-o-user-circle')
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('first_name')
-                            ->required(),
-                        Forms\Components\TextInput::make('last_name')
-                            ->required(),
-                        Forms\Components\TextInput::make('nickname'),
+                        Split::make([
+                            Section::make([
+                                Forms\Components\TextInput::make('first_name')
+                                    ->required(),
+                                Forms\Components\TextInput::make('last_name')
+                                    ->required(),
+                                Forms\Components\TextInput::make('nickname'),
+                            ])->columns(2),
+                            Section::make([
+                                FileUpload::make('avatar')
+                                    ->avatar()
+                                    ->directory('avatars')
+                                    ->imageEditor()
+                                    ->maxSize(1024 * 1024 * 10)
+                                    ->columnSpanFull(),
+                            ])->grow(false),
+                        ])
+                            ->from('md')
+                            ->columnSpanFull(),
 
-                        Forms\Components\Textarea::make('avatar'),
                         Forms\Components\MarkdownEditor::make('bio')
                             ->disableToolbarButtons([
                                 'attachFiles',
