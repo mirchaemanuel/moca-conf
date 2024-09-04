@@ -6,6 +6,7 @@ use App\Enums\ConferenceStatus;
 use App\Filament\Resources\ConferenceResource\Pages;
 use App\Models\Conference;
 use App\Models\Venue;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -111,7 +112,34 @@ class ConferenceResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+
+                    // publish a draft/archived conference
+                    Tables\Actions\Action::make(__('Publish'))
+                        ->icon('heroicon-o-eye')
+                        ->visible(fn($record) => $record->status === ConferenceStatus::Draft || $record->status === ConferenceStatus::Archived)
+                        ->action(fn($record) => $record->update(['status' => ConferenceStatus::Published])),
+
+                    // unpublish a published conference
+                    Tables\Actions\Action::make(__('Unpublish'))
+                        ->icon('heroicon-o-eye-slash')
+                        ->visible(fn($record) => $record->status === ConferenceStatus::Published)
+                        ->action(fn($record) => $record->update(['status' => ConferenceStatus::Draft])),
+
+                    // archive an unarchived conference
+                    Tables\Actions\Action::make(__('Archive'))
+                        ->icon('heroicon-o-archive-box')
+                        ->visible(fn($record) => $record->status !== ConferenceStatus::Archived && $record->status !== ConferenceStatus::Cancelled)
+                        ->action(fn($record) => $record->update(['status' => ConferenceStatus::Archived])),
+
+                    // cancel an umpublished and uncancelled conference
+                    Tables\Actions\Action::make(__('Cancel'))
+                        ->icon('heroicon-c-x-circle')
+                        ->visible(fn($record) => $record->status !== ConferenceStatus::Cancelled && $record->status !== ConferenceStatus::Published)
+                        ->action(fn($record) => $record->update(['status' => ConferenceStatus::Cancelled])),
+
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

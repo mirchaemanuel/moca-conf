@@ -666,3 +666,27 @@ options based on the `ConferenceStatus` enum.
         ->searchable(),
 ])
 ```
+
+#### Table Actions
+
+Filament's tables can use Actions. They are buttons that can be added to the end of any table row, or even in the header 
+of a table. Actions can be used to perform actions on a single record, or multiple records.
+
+For more information [Filament Table Builder - Actions](https://filamentphp.com/docs/3.x/tables/actions)
+
+##### Publish, Archive, Cancel Actions
+
+In the `Conference` table, I added three actions: Publish, Archive, Cancel. These actions are based on the status of the
+conference.
+
+E.g. the action to publish a draft conference will be:
+
+```php
+Tables\Actions\Action::make('Publish')
+    ->visible(fn($record) => $record->status === ConferenceStatus::Draft)
+    ->action(fn($record) => $record->update(['status' => ConferenceStatus::Published])),
+```
+
+The actions can be grouped in a dropdown menu. I added a classic three dots menu to for grouping the actions. And I added
+an icon to each action.
+
