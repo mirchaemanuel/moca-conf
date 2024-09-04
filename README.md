@@ -632,3 +632,37 @@ So the column definition is:
      ->icon(fn($record) => $record->status->getIcon())
      ->color(fn($record) => $record->status->getColor()),
 ```
+
+#### Filters
+
+Filters allow you to define certain constraints on your data, and allow users to scope it to find the information they
+need.
+
+##### Available filters
+
+By default, using the Filter::make() method will render a checkbox form component. When the checkbox is on, the query() 
+will be activated.
+
+You can use different filters:
+- checkbox
+- toggle
+- ternary
+- trashed
+- select
+- query builder
+- custom.
+
+For more information [Filament Table Builder - Filters](https://filamentphp.com/docs/3.x/tables/filters/getting-started)
+
+##### Status Filter
+
+In the `Conference` table, I added a filter to filter the conferences by status. The filter is a select input with the
+options based on the `ConferenceStatus` enum.
+
+```php
+->filters([
+    SelectFilter::make('status')
+        ->options(ConferenceStatus::toSelectArray())
+        ->searchable(),
+])
+```

@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
@@ -105,7 +106,9 @@ class ConferenceResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('status')
+                    ->options(ConferenceStatus::class)
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
