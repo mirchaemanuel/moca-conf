@@ -6,9 +6,8 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 
-enum ConferenceStatus: string implements HasIcon, HasDescription, HasColor
+enum ConferenceStatus: string implements HasColor, HasDescription, HasIcon
 {
-
     case Draft = 'draft';
     case Published = 'published';
     case Archived = 'archived';

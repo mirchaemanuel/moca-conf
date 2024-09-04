@@ -6,12 +6,12 @@ use App\Enums\ConferenceStatus;
 use App\Filament\Resources\ConferenceResource\Pages;
 use App\Models\Conference;
 use App\Models\Venue;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -37,7 +37,7 @@ class ConferenceResource extends Resource
                             ->createOptionForm(
                                 VenueResource::getFormSchema()
                             )
-                            ->getOptionLabelFromRecordUsing(fn(Venue $venue): string => "{$venue->name} - {$venue->city} ({$venue->state}) - {$venue->country}")
+                            ->getOptionLabelFromRecordUsing(fn (Venue $venue): string => "{$venue->name} - {$venue->city} ({$venue->state}) - {$venue->country}")
                             ->required(),
                     ]),
                 Forms\Components\Section::make(__('General Information'))
@@ -46,13 +46,13 @@ class ConferenceResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state ?? '')))
+                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state ?? '')))
                             ->required(),
                         Forms\Components\TextInput::make('slug')
                             ->required(),
                         Forms\Components\MarkdownEditor::make('description')
                             ->disableToolbarButtons([
-                                'attachFiles'
+                                'attachFiles',
                             ])
                             ->columnSpanFull(),
                     ]),
@@ -92,10 +92,9 @@ class ConferenceResource extends Resource
                 Tables\Columns\TextColumn::make('end_date')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('status')
-                    ->icon(fn($record) => $record->status->getIcon())
-                    ->color(fn($record) => $record->status->getColor())
-                    ->tooltip(fn($record) => $record->status->value)
+                Tables\Columns\TextColumn::make('status')
+                    ->badge(fn ($record) => $record->status->getColor())
+                    ->tooltip(fn ($record) => $record->status->value)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -118,28 +117,28 @@ class ConferenceResource extends Resource
                     // publish a draft/archived conference
                     Tables\Actions\Action::make(__('Publish'))
                         ->icon('heroicon-o-eye')
-                        ->visible(fn($record) => $record->status === ConferenceStatus::Draft || $record->status === ConferenceStatus::Archived)
-                        ->action(fn($record) => $record->update(['status' => ConferenceStatus::Published])),
+                        ->visible(fn ($record) => $record->status === ConferenceStatus::Draft || $record->status === ConferenceStatus::Archived)
+                        ->action(fn ($record) => $record->update(['status' => ConferenceStatus::Published])),
 
                     // unpublish a published conference
                     Tables\Actions\Action::make(__('Unpublish'))
                         ->icon('heroicon-o-eye-slash')
-                        ->visible(fn($record) => $record->status === ConferenceStatus::Published)
-                        ->action(fn($record) => $record->update(['status' => ConferenceStatus::Draft])),
+                        ->visible(fn ($record) => $record->status === ConferenceStatus::Published)
+                        ->action(fn ($record) => $record->update(['status' => ConferenceStatus::Draft])),
 
                     // archive an unarchived conference
                     Tables\Actions\Action::make(__('Archive'))
                         ->icon('heroicon-o-archive-box')
-                        ->visible(fn($record) => $record->status !== ConferenceStatus::Archived && $record->status !== ConferenceStatus::Cancelled)
-                        ->action(fn($record) => $record->update(['status' => ConferenceStatus::Archived])),
+                        ->visible(fn ($record) => $record->status !== ConferenceStatus::Archived && $record->status !== ConferenceStatus::Cancelled)
+                        ->action(fn ($record) => $record->update(['status' => ConferenceStatus::Archived])),
 
                     // cancel an umpublished and uncancelled conference
                     Tables\Actions\Action::make(__('Cancel'))
                         ->icon('heroicon-c-x-circle')
-                        ->visible(fn($record) => $record->status !== ConferenceStatus::Cancelled && $record->status !== ConferenceStatus::Published)
-                        ->action(fn($record) => $record->update(['status' => ConferenceStatus::Cancelled])),
+                        ->visible(fn ($record) => $record->status !== ConferenceStatus::Cancelled && $record->status !== ConferenceStatus::Published)
+                        ->action(fn ($record) => $record->update(['status' => ConferenceStatus::Cancelled])),
 
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -158,9 +157,9 @@ class ConferenceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListConferences::route('/'),
+            'index' => Pages\ListConferences::route('/'),
             'create' => Pages\CreateConference::route('/create'),
-            'edit'   => Pages\EditConference::route('/{record}/edit'),
+            'edit' => Pages\EditConference::route('/{record}/edit'),
         ];
     }
 }

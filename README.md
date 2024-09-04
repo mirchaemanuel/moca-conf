@@ -690,3 +690,15 @@ Tables\Actions\Action::make('Publish')
 The actions can be grouped in a dropdown menu. I added a classic three dots menu to for grouping the actions. And I added
 an icon to each action.
 
+#### Badge Column
+
+I prefer to use a badge to represent the status of the conference. The badge is based on the status of the conference.
+
+I've updated the column definition to:
+
+```php
+Tables\Columns\TextColumn::make('status')
+    ->badge(fn($record) => $record->status->getColor())
+    ->tooltip(fn($record) => $record->status->value)
+    ->sortable(),
+```
