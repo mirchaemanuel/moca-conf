@@ -523,3 +523,185 @@ E.g. search filter for country column of VenueResource:
 
 #### Venue table result
 ![VenueResource_table_07.png](/docs/images/VenueResource_table_07.png)
+
+### 08: Filament - Conference Resource
+
+In this stage, I'm applying the form inputs and table builder to the Conference resource.
+
+#### Select Input - Creating new option
+
+Filament allows you to create new options for a select input. This is useful when you want to add a new option to a select
+input without leaving the form.
+
+```php
+Forms\Components\Select::make('venue_id')
+                    ->relationship('venue', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm(
+                       // ...  
+                    )
+                    ->required(),
+```
+
+Inside `createOptionForm` method you can define the form fields to create a new Venue. To avoid duplication, I extracted
+the Venue form schema to a separate method and used it in the Conference form schema.
+
+```php
+Forms\Components\Select::make('venue_id')
+                    ->relationship('venue', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm(
+                        VenueResource::getFormSchema()
+                    )
+                    ->required(),
+```
+
+#### Select - customizing the relationship option labels
+
+We can use `getOptionLabelFromRecordUsing` method to customize the option labels in a select input.
+
+```php
+ Forms\Components\Select::make('venue_id')
+                            //...
+                            ->getOptionLabelFromRecordUsing(
+                                fn(Venue $venue): string => "{$venue->name} - {$venue->city} ({$venue->state}) - {$venue->country}"
+                                )
+                            ->required(),
+```
+
+#### Reactive Fields - Generating Slug
+
+Filament allows you to create reactive fields. Reactive fields are fields that automatically update based on the value of
+another field. This is useful when you want to generate a value based on another field's value.
+
+In Conference resource we want to generate a slug based on the conference name.
+
+I marked the `name` field as reactive adding the `->live()` method.
+
+```php 
+Forms\Components\TextInput::make('name')
+     ->live(onBlur: true)
+```
+
+By default, when a field is set to live(), the form will re-render every time the field is interacted with. This can be
+changed by passing a boolean value to the live() method: `onBlur: true`. This will only re-render the form when the field
+loses focus.
+
+Then I used the `afterStateUpdated` method to customize what happens after a field is updated by the user.
+
+```php
+ Forms\Components\TextInput::make('name')
+    ->live(onBlur: true)
+    ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state ?? '')))
+    ->required(),
+```
+
+When the user types in the `name` field, the `slug` field will automatically update with the slug of the name.
+
+#### Markdown Editor
+
+Filament provides rich text editor and markdown editor fields. These fields allow you to add rich text and markdown
+content to your forms.
+
+We desire the `description` of the `Conference` to be rendered in markdown. So I used the `MarkdownEditor` field.
+
+```php
+Forms\Components\TextInput::make('slug')
+    ->disableToolbarButtons([
+        'attachFiles'
+    ])
+    ->required(),
+```
+
+The `MarkdownEditor` can be customized enabling or disabling buttons in the toolbar.
+
+#### Conference Table
+
+##### Icon Column
+
+The `Conference` table has a column `status` represented with an icon. The icon is based on the status of the conference.
+The `ConferenceStatus` enum implements these three interfaces: `HasIcon`, `HasDescription`, `HasColor` to provide icon, 
+description and color for each status.
+
+So the column definition is:
+
+```php
+ Tables\Columns\IconColumn::make('status')
+     ->icon(fn($record) => $record->status->getIcon())
+     ->color(fn($record) => $record->status->getColor()),
+```
+
+#### Filters
+
+Filters allow you to define certain constraints on your data, and allow users to scope it to find the information they
+need.
+
+##### Available filters
+
+By default, using the Filter::make() method will render a checkbox form component. When the checkbox is on, the query() 
+will be activated.
+
+You can use different filters:
+- checkbox
+- toggle
+- ternary
+- trashed
+- select
+- query builder
+- custom.
+
+For more information [Filament Table Builder - Filters](https://filamentphp.com/docs/3.x/tables/filters/getting-started)
+
+##### Status Filter
+
+In the `Conference` table, I added a filter to filter the conferences by status. The filter is a select input with the
+options based on the `ConferenceStatus` enum.
+
+```php
+->filters([
+    SelectFilter::make('status')
+        ->options(ConferenceStatus::toSelectArray())
+        ->searchable(),
+])
+```
+
+#### Table Actions
+
+Filament's tables can use Actions. They are buttons that can be added to the end of any table row, or even in the header 
+of a table. Actions can be used to perform actions on a single record, or multiple records.
+
+For more information [Filament Table Builder - Actions](https://filamentphp.com/docs/3.x/tables/actions)
+
+##### Publish, Archive, Cancel Actions
+
+In the `Conference` table, I added three actions: Publish, Archive, Cancel. These actions are based on the status of the
+conference.
+
+E.g. the action to publish a draft conference will be:
+
+```php
+Tables\Actions\Action::make('Publish')
+    ->visible(fn($record) => $record->status === ConferenceStatus::Draft)
+    ->action(fn($record) => $record->update(['status' => ConferenceStatus::Published])),
+```
+
+The actions can be grouped in a dropdown menu. I added a classic three dots menu to for grouping the actions. And I added
+an icon to each action.
+
+#### Badge Column
+
+I prefer to use a badge to represent the status of the conference. The badge is based on the status of the conference.
+
+I've updated the column definition to:
+
+```php
+Tables\Columns\TextColumn::make('status')
+    ->badge(fn($record) => $record->status->getColor())
+    ->tooltip(fn($record) => $record->status->value)
+    ->sortable(),
+```
+
+The result of the table is:
+![ConferenceResource_table_08.png](/docs/images/ConferenceResource_table_08.png)

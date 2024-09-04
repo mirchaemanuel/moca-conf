@@ -21,37 +21,7 @@ class VenueResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\Section::make(__('General Information'))
-                    ->icon('heroicon-o-information-circle')
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->columnSpanFull(),
-                    ]),
-                Forms\Components\Section::make(__('Location'))
-                    ->description(__('Address information for this venue.'))
-                    ->icon('heroicon-o-map')
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\TextInput::make('address')
-                            ->columnSpanFull()
-                            ->required(),
-                        Forms\Components\TextInput::make('city')
-                            ->required(),
-                        Forms\Components\TextInput::make('state')
-                            ->required(),
-                        Forms\Components\TextInput::make('zip')
-                            ->required(),
-                        Forms\Components\Select::make('country')
-                            ->placeholder(__('Select a country'))
-                            ->searchable()
-                            ->options(
-                                Countries::getList(app()->getLocale())
-                            )
-                            ->required(),
-                    ]),
-            ]);
+            ->schema(self::getFormSchema());
     }
 
     public static function table(Table $table): Table
@@ -114,6 +84,44 @@ class VenueResource extends Resource
             'index'  => Pages\ListVenues::route('/'),
             'create' => Pages\CreateVenue::route('/create'),
             'edit'   => Pages\EditVenue::route('/{record}/edit'),
+        ];
+    }
+
+    /**
+     * @return array<Forms\Components\Component>
+     */
+    public static function getFormSchema(): array
+    {
+        return [
+            Forms\Components\Section::make(__('General Information'))
+                ->icon('heroicon-o-information-circle')
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->required()
+                        ->columnSpanFull(),
+                ]),
+            Forms\Components\Section::make(__('Location'))
+                ->description(__('Address information for this venue.'))
+                ->icon('heroicon-o-map')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\TextInput::make('address')
+                        ->columnSpanFull()
+                        ->required(),
+                    Forms\Components\TextInput::make('city')
+                        ->required(),
+                    Forms\Components\TextInput::make('state')
+                        ->required(),
+                    Forms\Components\TextInput::make('zip')
+                        ->required(),
+                    Forms\Components\Select::make('country')
+                        ->placeholder(__('Select a country'))
+                        ->searchable()
+                        ->options(
+                            Countries::getList(app()->getLocale())
+                        )
+                        ->required(),
+                ]),
         ];
     }
 }
