@@ -20,27 +20,58 @@ class SpeakerResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('first_name')
-                    ->required(),
-                Forms\Components\TextInput::make('last_name')
-                    ->required(),
-                Forms\Components\TextInput::make('nickname'),
-                Forms\Components\Textarea::make('avatar')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('bio')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('email')
-                    ->email(),
-                Forms\Components\TextInput::make('phone')
-                    ->tel(),
-                Forms\Components\TextInput::make('company'),
-                Forms\Components\TextInput::make('job_title'),
-                Forms\Components\TextInput::make('linkedin'),
-                Forms\Components\TextInput::make('twitter'),
-                Forms\Components\TextInput::make('facebook'),
-                Forms\Components\TextInput::make('instagram'),
-                Forms\Components\Textarea::make('notes')
-                    ->columnSpanFull(),
+
+                Forms\Components\Section::make(__('General Information'))
+                    ->icon('heroicon-o-user-circle')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('first_name')
+                            ->required(),
+                        Forms\Components\TextInput::make('last_name')
+                            ->required(),
+                        Forms\Components\TextInput::make('nickname'),
+
+                        Forms\Components\Textarea::make('avatar'),
+                        Forms\Components\MarkdownEditor::make('bio')
+                            ->disableToolbarButtons([
+                                'attachFiles',
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\Section::make(__('Job Information'))
+                    ->icon('heroicon-s-briefcase')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('company'),
+                        Forms\Components\TextInput::make('job_title'),
+                    ]),
+                Forms\Components\Section::make(__('Contacts'))
+                    ->icon('heroicon-o-device-phone-mobile')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('email')
+                            ->email(),
+                        Forms\Components\TextInput::make('phone')
+                            ->tel(),
+                    ]),
+                Forms\Components\Section::make(__('Social'))
+                    ->icon('heroicon-s-user-group')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('linkedin')->url(),
+                        Forms\Components\TextInput::make('twitter')->url(),
+                        Forms\Components\TextInput::make('facebook')->url(),
+                        Forms\Components\TextInput::make('instagram')->url(),
+                    ]),
+                Forms\Components\Section::make(__('Internal Information'))
+                    ->icon('heroicon-o-ellipsis-horizontal')
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Textarea::make('notes')
+                            ->columnSpanFull(),
+                    ]),
+
+
             ]);
     }
 
@@ -102,9 +133,9 @@ class SpeakerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSpeakers::route('/'),
+            'index'  => Pages\ListSpeakers::route('/'),
             'create' => Pages\CreateSpeaker::route('/create'),
-            'edit' => Pages\EditSpeaker::route('/{record}/edit'),
+            'edit'   => Pages\EditSpeaker::route('/{record}/edit'),
         ];
     }
 }

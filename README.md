@@ -705,3 +705,12 @@ Tables\Columns\TextColumn::make('status')
 
 The result of the table is:
 ![ConferenceResource_table_08.png](/docs/images/ConferenceResource_table_08.png)
+
+
+### 09 Filament - Speaker Resource
+
+In this stage, I'm applying the form inputs and table builder to the Speaker resource. The Speaker resource is the most
+complex resource in the application. It has a many-to-many relationship with the Talk resource. The Speaker form has also
+a file upload field to upload the speaker's photo.
+
+
