@@ -12,6 +12,7 @@ use Filament\Forms\Components\Split;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class SpeakerResource extends Resource
@@ -115,13 +116,16 @@ class SpeakerResource extends Resource
                     ->height(120)
                     ->circular(),
                 Tables\Columns\TextColumn::make('first_name')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_name')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nickname')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('country')
-                    ->searchable(),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
@@ -144,15 +148,19 @@ class SpeakerResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('country')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->options(
+                        Countries::getList(app()->getLocale())
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+
             ]);
     }
 

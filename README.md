@@ -865,3 +865,21 @@ Remember to run the migration:
 ```bash
 php artisan migrate
 ```
+
+#### Table Filters: country
+
+I've added a filter to filter the speakers by country. The filter is a select input with the options based on the
+`Country` list.
+
+```php
+ SelectFilter::make('country')
+     ->multiple()
+     ->searchable()
+     ->preload()
+     ->options(
+         Countries::getList(app()->getLocale())
+     ),
+```
+
+The result:
+![speaker_table_country_filter.png](/docs/images/speaker_table_country_filter.png)
