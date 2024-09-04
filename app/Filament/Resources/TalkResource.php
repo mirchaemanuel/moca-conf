@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\TalkStatus;
+use App\Enums\TalkType;
 use App\Filament\Resources\TalkResource\Pages;
+use App\Models\Speaker;
 use App\Models\Talk;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -20,28 +23,66 @@ class TalkResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('speaker_id')
-                    ->relationship('speaker', 'id')
-                    ->required(),
-                Forms\Components\Select::make('talk_category_id')
-                    ->relationship('talkCategory', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('title')
-                    ->required(),
-                Forms\Components\Textarea::make('abstract')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('type')
-                    ->required(),
-                Forms\Components\TextInput::make('duration')
-                    ->required()
-                    ->numeric()
-                    ->default(30),
-                Forms\Components\TextInput::make('status')
-                    ->required(),
+                Forms\Components\Section::make(__('Base Information'))
+                    ->icon('heroicon-o-user-circle')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('speaker_id')
+                            ->relationship('speaker', 'id')
+                            ->searchable()
+                            ->preload()
+                            ->getOptionLabelFromRecordUsing(fn(Speaker $speaker): string => "{$speaker->first_name} {$speaker->last_name} ({$speaker->nickname})")
+                            ->required(),
+                        Forms\Components\TextInput::make('title')
+                            ->columnSpanFull()
+                            ->required(),
+                    ]),
+                Forms\Components\Section::make(__('Details'))
+                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Textarea::make('abstract')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\RichEditor::make('description')
+                            ->disableToolbarButtons([
+                                'attachFiles',
+                            ])
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+
+                Forms\Components\Section::make(__('Characteristics'))
+                    ->icon('heroicon-o-ellipsis-horizontal-circle')
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\Select::make('talk_category_id')
+                            ->relationship('talkCategory', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\Select::make('type')
+                            ->options(TalkType::class)
+                            ->native(false)
+                            ->required(),
+                        Forms\Components\TextInput::make('duration')
+                            ->hint('In minutes')
+                            ->required()
+                            ->integer()
+                            ->default(30),
+                    ]),
+                Forms\Components\Fieldset::make(__('Status'))
+                    ->schema([
+                        Forms\Components\Radio::make('status')
+                            ->label('')
+                            ->options(
+                                TalkStatus::class
+                            )
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+
+
             ]);
     }
 
@@ -58,11 +99,15 @@ class TalkResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->tooltip(fn(Talk $record) => $record->type->getDescription())
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('duration')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -74,7 +119,22 @@ class TalkResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('speaker_id')
+                    ->relationship('speaker', 'id')
+                    ->searchable()
+                    ->preload()
+                    ->getOptionLabelFromRecordUsing(fn(Speaker $speaker): string => "{$speaker->first_name} {$speaker->last_name} ({$speaker->nickname})"),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options(TalkStatus::class)
+                    ->preload()
+                    ->multiple()
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('type')
+                    ->options(TalkType::class)
+                    ->preload()
+                    ->multiple()
+                    ->searchable(),
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -96,9 +156,9 @@ class TalkResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTalks::route('/'),
+            'index'  => Pages\ListTalks::route('/'),
             'create' => Pages\CreateTalk::route('/create'),
-            'edit' => Pages\EditTalk::route('/{record}/edit'),
+            'edit'   => Pages\EditTalk::route('/{record}/edit'),
         ];
     }
 }

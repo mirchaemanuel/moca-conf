@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\ConferenceStatus;
+use App\Enums\TalkStatus;
 use App\Filament\Resources\ConferenceResource\Pages;
 use App\Models\Conference;
 use App\Models\Venue;
@@ -65,11 +66,15 @@ class ConferenceResource extends Resource
                         Forms\Components\DateTimePicker::make('end_date')
                             ->required(),
                     ]),
-                Forms\Components\Radio::make('status')
-                    ->options(
-                        ConferenceStatus::class
-                    )
-                    ->required(),
+                Forms\Components\Fieldset::make(__('Status'))
+                    ->schema([
+                        Forms\Components\Radio::make('status')
+                            ->label('')
+                            ->options(
+                                ConferenceStatus::class
+                            )->required()
+                            ->columnSpanFull(),
+                    ]),
             ]);
 
     }
