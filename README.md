@@ -702,3 +702,6 @@ Tables\Columns\TextColumn::make('status')
     ->tooltip(fn($record) => $record->status->value)
     ->sortable(),
 ```
+
+The result of the table is:
+![ConferenceResource_table_08.png](/docs/images/ConferenceResource_table_08.png)
