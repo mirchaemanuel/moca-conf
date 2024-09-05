@@ -938,3 +938,48 @@ to allow the selection of only submitted talk.
 
 The result:
 ![talk_table_bulk_actions.png](/docs/images/talk_table_bulk_actions.png)
+
+#### Column relationships - label
+
+You may use "dot notation" to access columns within relationships. The name of the relationship comes first, followed 
+by a period, followed by the name of the column to display:
+
+```php
+Tables\Columns\TextColumn::make('speaker.firstname')
+```
+
+We want display name and last name of the speaker in the Talk table, so we can use an `Attribute` in the model and 
+then access it in the column definition.
+
+`Speaker.php`
+```php
+    /**
+     * @return Attribute<Speaker, String> the full name of the speaker
+     */
+    public function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->first_name . ' ' . $this->last_name,
+        );
+    }
+```
+
+and then in table definition:
+
+```php
+Tables\Columns\TextColumn::make('speaker.fullName')
+```
+
+(In some cases, can be better to use `virtual columns` in the database)
+
+##### Searchable columns
+
+You can make a column searchable by using the `searchable()`. The method also accepts, for relationships columns, a
+list of columns to search.
+
+For the Speaker we want to search by first name and last name:
+```php
+Tables\Columns\TextColumn::make('speaker.fullName')
+    ->searchable(['first_name', 'last_name']),
+```
+

@@ -93,8 +93,8 @@ class TalkResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('speaker.id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('speaker.fullName')
+                    ->searchable(['first_name', 'last_name'])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('talkCategory.name')
                     ->numeric()
