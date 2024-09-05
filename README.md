@@ -884,6 +884,10 @@ I've added a filter to filter the speakers by country. The filter is a select in
 The result:
 ![speaker_table_country_filter.png](/docs/images/speaker_table_country_filter.png)
 
+### 10 Filament - Talk Resource
+
+In this stage, I'm applying the form inputs and table builder to the Talk resource.
+
 #### Table Actions: accept, reject, cancel talk
 
 I've added three actions to the Speaker table: Accept, Reject, Cancel Talk. These actions are based on the status of the
