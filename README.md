@@ -989,3 +989,130 @@ Tables\Columns\TextColumn::make('speaker.fullName')
 
 The result of the relationship column:
 ![talk_table_speaker_fullname.png](/docs/images/talk_table_speaker_fullname.png)
+
+
+### 11 Filament - Managing Relationships
+
+In this stage, I'm managing the relationships between the resources. The Talk resource has a many-to-many relationship
+with the Conference resource. And this many-to-many has a pivot model `ConferenceTalk` with additional fields.
+
+Filament provides many ways to manage relationships in the app. Which feature you should use depends on the type of 
+relationship you are managing, and which UI you are looking for.
+
+For more information [Filament Panel Builder - Relationships](https://filamentphp.com/docs/3.x/panels/resources/relation-managers)
+
+#### Relation Manager
+
+Relation managers are interactive tables that allow administrators to list, create, attach, associate, edit, detach, 
+dissociate and delete related records without leaving the resource's Edit or View page.
+
+These are compatible with `HasMany`, `HasManyThrough`, `BelongsToMany`, `MorphMany` and `MorphToMany` relationships.
+
+To create a relation manager, you can use the `make:filament-relation-manager` command:
+
+The created relation manager must be registered in your resources's `getRelations()` method.
+
+#### ConferenceTalk relation
+Conferences and Talks have a many-to-many relationship. The pivot model is `ConferenceTalk`. The pivot model has an
+additional field `start_time` to store the start time of the talk in the conference.
+
+> For local test purpose, I've added a seeder to create some `ConferenceTalk` records.
+> You can run fresh migration and seeder with `php artisan mc:demo` command.
+
+I've created the relation manager with the following command:
+
+```bash
+php artisan make:filament-relation-manager
+```
+
+The command asked me to choose the resource and the relationship:
+
+```
+❯ php artisan make:filament-relation-manager
+
+ ┌ What is the resource you would like to create this in? ──────┐
+ │ ConferenceResource                                           │
+ └──────────────────────────────────────────────────────────────┘
+
+ ┌ What is the relationship? ───────────────────────────────────┐
+ │ talks                                                        │
+ └──────────────────────────────────────────────────────────────┘
+
+ ┌ What is the title attribute? ────────────────────────────────┐
+ │ title                                                        │
+ └──────────────────────────────────────────────────────────────┘
+
+   INFO  Filament relation manager [app/Filament/Resources/ConferenceResource/RelationManagers/TalksRelationManager.php] created successfully.  
+
+   INFO  Make sure to register the relation in `ConferenceResource::getRelations()`.  
+
+```
+
+The `ConferenceResource/RelationManagers/TalksRelationManager.php` is similar to other Filament resources. It has a
+`table` method to define the columns of the relation manager table and a `form` method to define the form fields.
+
+I've updated the `ConferenceResource` to include the `TalksRelationManager` in the `getRelations()` method.
+
+```php
+    public static function getRelations(): array
+    {
+        return [
+            TalksRelationManager::class,
+        ];
+    }
+```
+
+Accessing the Conference resource, you can see the Talks relation manager table in the bottom of the form.
+
+I've customized the `table` to include some more data to the talk record.
+
+So the resulting relation table is:
+![conference_talk_relation_table_01.png](/docs/images/conference_talk_relation_table_01.png)
+
+##### Attaching and Detaching talks
+
+Filament is able to attach and detach records for BelongsToMany and MorphToMany relationships.
+
+I've added table actions to attach and detach talks. We want to attach only accepted talks.
+
+```php
+ ->headerActions([
+     Tables\Actions\AttachAction::make()
+         ->form(fn(AttachAction $action): array => [
+             $action->getRecordSelect(),
+             Forms\Components\DateTimePicker::make('date_time')
+                 ->seconds(false)
+                 ->minDate($this->getOwnerRecord()->start_date)
+                 ->maxDate($this->getOwnerRecord()->end_date)
+                 ->required(),
+         ])
+         ->recordSelectOptionsQuery(fn(Builder $query) => $query->whereStatus(TalkStatus::Accepted)),
+ ])
+ ->actions([
+     Tables\Actions\DetachAction::make()->requiresConfirmation(),
+ ])
+ ->bulkActions([
+     Tables\Actions\BulkActionGroup::make([
+         Tables\Actions\DetachBulkAction::make()->requiresConfirmation(),
+     ]),
+ ]);
+```
+
+I've also customized the `AttachAction` form to include the `date_time` field. 
+
+The `date_time` field has some validation to spot the date between the conference start and end date.
+
+The result is:
+![conference_talk_relation_table_02.png](/docs/images/conference_talk_relation_table_02.png)
+
+If the Conference is not in `draft` status, we want to disable the attach and detach actions. We can perform this by
+overriding the method `isReadOnly` in the `TalksRelationManager` class.
+
+```php
+    public function isReadOnly(): bool
+    {
+        /** @var \App\Models\Conference $conference */
+        $conference = $this->getOwnerRecord();
+        return $conference->status !== ConferenceStatus::Draft;    
+    }
+```

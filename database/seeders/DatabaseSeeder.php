@@ -20,5 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AddLocalVenueSeeder::class);
         $this->call(AddLocalSpeakerSeeder::class);
 
+        $this->call(AttachTalkConferenceSeeder::class);
+
     }
 }
