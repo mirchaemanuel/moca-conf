@@ -57,6 +57,7 @@ class TalksRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\AttachAction::make()
+                    ->preloadRecordSelect()
                     ->form(fn(AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\DateTimePicker::make('date_time')

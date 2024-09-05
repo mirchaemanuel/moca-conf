@@ -175,4 +175,5 @@ class ConferenceResource extends Resource
             'edit'   => Pages\EditConference::route('/{record}/edit'),
         ];
     }
+
 }
