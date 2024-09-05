@@ -4,9 +4,11 @@ namespace App\Filament\Resources\ConferenceResource\RelationManagers;
 
 use App\Enums\ConferenceStatus;
 use App\Enums\TalkStatus;
+use App\Filament\Resources\TalkResource;
 use App\Models\Conference;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Actions\AttachAction;
@@ -69,13 +71,22 @@ class TalksRelationManager extends RelationManager
                     ->recordSelectOptionsQuery(fn(Builder $query) => $query->whereStatus(TalkStatus::Accepted)),
             ])
             ->actions([
-                Tables\Actions\DetachAction::make()->requiresConfirmation(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DetachAction::make()->requiresConfirmation(),
+                    Tables\Actions\ViewAction::make(),
+                ]),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DetachBulkAction::make()->requiresConfirmation(),
                 ]),
             ]);
+    }
+
+    public function infolist(Infolist $infolist): Infolist
+    {
+        return TalkResource::infolist($infolist);
     }
 
     public function isReadOnly(): bool
