@@ -97,6 +97,7 @@ class TalkResource extends Resource
                     ->searchable(['first_name', 'last_name'])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('talkCategory.name')
+                    ->label(__('Category'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),

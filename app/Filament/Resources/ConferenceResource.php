@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\ConferenceStatus;
 use App\Filament\Resources\ConferenceResource\Pages;
+use App\Filament\Resources\ConferenceResource\RelationManagers\TalksRelationManager;
 use App\Models\Conference;
 use App\Models\Venue;
 use Filament\Forms;
@@ -162,7 +163,7 @@ class ConferenceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            TalksRelationManager::class,
         ];
     }
 
@@ -174,4 +175,5 @@ class ConferenceResource extends Resource
             'edit'   => Pages\EditConference::route('/{record}/edit'),
         ];
     }
+
 }
