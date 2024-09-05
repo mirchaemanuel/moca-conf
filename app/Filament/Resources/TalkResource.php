@@ -11,7 +11,9 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class TalkResource extends Resource
 {
@@ -66,7 +68,8 @@ class TalkResource extends Resource
                             ->native(false)
                             ->required(),
                         Forms\Components\TextInput::make('duration')
-                            ->hint('In minutes')
+                            ->prefixIcon('heroicon-o-clock')
+                            ->suffix(' min')
                             ->required()
                             ->integer()
                             ->default(30),
@@ -98,16 +101,19 @@ class TalkResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('duration')
+                    ->numeric()
+                    ->suffix(' min')
+                    ->icon('heroicon-o-clock')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->tooltip(fn(Talk $record) => $record->type->getDescription())
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('duration')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -137,13 +143,62 @@ class TalkResource extends Resource
 
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+
+                    // accept a submitted talk
+                    Tables\Actions\Action::make('Accept')
+                        ->requiresConfirmation()
+                        ->color('success')
+                        ->icon('heroicon-o-check-circle')
+                        ->visible(fn($record) => $record->status === TalkStatus::Submitted)
+                        ->action(fn($record) => $record->update(['status' => TalkStatus::Accepted])),
+
+                    // reject a submitted talk
+                    Tables\Actions\Action::make('Reject')
+                        ->requiresConfirmation()
+                        ->color('warning')
+                        ->icon('heroicon-o-x-circle')
+                        ->visible(fn($record) => $record->status === TalkStatus::Submitted)
+                        ->action(fn($record) => $record->update(['status' => TalkStatus::Rejected])),
+
+                    // cancel a submitted talk
+                    Tables\Actions\Action::make('Cancel')
+                        ->requiresConfirmation()
+                        ->color('danger')
+                        ->icon('heroicon-o-trash')
+                        ->visible(fn($record) => $record->status === TalkStatus::Submitted)
+                        ->action(fn($record) => $record->update(['status' => TalkStatus::Cancelled])),
+
+                    // restore to submitted a cancelled/rejected/accepted talk
+                    Tables\Actions\Action::make(__('Restore to Submitted'))
+                        ->requiresConfirmation()
+                        ->color('primary')
+                        ->icon('heroicon-o-arrow-path')
+                        ->visible(fn($record) => $record->status !== TalkStatus::Submitted)
+                        ->action(fn($record) => $record->update(['status' => TalkStatus::Submitted])),
+
+                ])
+
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+                Tables\Actions\BulkAction::make(__('Accept all'))
+                    ->color('success')
+                    ->icon('heroicon-o-check-circle')
+                    ->requiresConfirmation()
+                    ->deselectRecordsAfterCompletion()
+                    ->action(fn(Collection $records) => $records->each->update(['status' => TalkStatus::Accepted])),
+                Tables\Actions\BulkAction::make(__('Reject all'))
+                    ->color('danger')
+                    ->icon('heroicon-o-x-circle')
+                    ->requiresConfirmation()
+                    ->deselectRecordsAfterCompletion()
+                    ->action(fn(Collection $records) => $records->each->update(['status' => TalkStatus::Rejected])),
+            ])
+            ->selectCurrentPageOnly()
+            ->checkIfRecordIsSelectableUsing(
+                fn(Talk $record): bool => $record->status === TalkStatus::Submitted,
+            );
     }
 
     public static function getRelations(): array
