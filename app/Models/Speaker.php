@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use AllowDynamicProperties;
 use Database\Factories\SpeakerFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,10 +25,20 @@ class Speaker extends Model
     /**
      * @return Attribute<Speaker, String> the full name of the speaker
      */
-    public function fullName(): Attribute
+    protected function fullName(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->first_name . ' ' . $this->last_name,
+        );
+    }
+
+    /**
+     * @return Attribute<Speaker, String> the full name of the speaker with nickname
+     */
+    protected function fullNameWithNick() : Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->first_name . ' ' . $this->last_name . ' (' . $this->nickname . ')',
         );
     }
 }

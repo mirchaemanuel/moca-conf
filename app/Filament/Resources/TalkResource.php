@@ -97,7 +97,6 @@ class TalkResource extends Resource
                     ->searchable(['first_name', 'last_name'])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('talkCategory.name')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
@@ -125,11 +124,12 @@ class TalkResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('speaker_id')
+                Tables\Filters\SelectFilter::make('speaker')
+                    ->label(__('Speaker'))
                     ->relationship('speaker', 'id')
                     ->searchable()
                     ->preload()
-                    ->getOptionLabelFromRecordUsing(fn(Speaker $speaker): string => "{$speaker->first_name} {$speaker->last_name} ({$speaker->nickname})"),
+                    ->getOptionLabelFromRecordUsing(fn(Speaker $speaker): string => $speaker->full_name_with_nick),
                 Tables\Filters\SelectFilter::make('status')
                     ->options(TalkStatus::class)
                     ->preload()
@@ -140,6 +140,11 @@ class TalkResource extends Resource
                     ->preload()
                     ->multiple()
                     ->searchable(),
+                Tables\Filters\SelectFilter::make('talk_category')
+                    ->label(__('Category'))
+                    ->relationship('talkCategory', 'name')
+                    ->searchable()
+                    ->preload(),
 
             ])
             ->actions([
