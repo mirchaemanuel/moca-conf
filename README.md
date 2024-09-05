@@ -883,3 +883,109 @@ I've added a filter to filter the speakers by country. The filter is a select in
 
 The result:
 ![speaker_table_country_filter.png](/docs/images/speaker_table_country_filter.png)
+
+### 10 Filament - Talk Resource
+
+In this stage, I'm applying the form inputs and table builder to the Talk resource.
+
+#### Table Actions: accept, reject, cancel talk
+
+I've added three actions to the Speaker table: Accept, Reject, Cancel Talk. These actions are based on the status of the
+talk. 
+
+We can as the user to confirm the action with `requiresConfirmation()` method:
+
+```php
+ // accept a submitted talk
+ Tables\Actions\Action::make('Accept')
+     ->requiresConfirmation()
+     ->color('success')
+     ->icon('heroicon-o-check-circle')
+     ->visible(fn($record) => $record->status === TalkStatus::Submitted)
+     ->action(fn($record) => $record->update(['status' => TalkStatus::Accepted])),
+```
+
+I'm updating also `ConferenceResource` with `requiresConfirmation()` method.
+
+#### Table Bulk Actions
+
+Bulk actions allow you to perform an action on multiple records at once. I've added a bulk action to the Speaker table to
+accept or reject multiple talks at once.
+
+```php
+->bulkActions([
+    Tables\Actions\BulkAction::make(__('Accept all'))
+        ->color('success')
+        ->icon('heroicon-o-check-circle')
+        ->requiresConfirmation()
+        ->deselectRecordsAfterCompletion()
+        ->action(fn(Collection $records) => $records->each->update(['status' => TalkStatus::Accepted])),
+    Tables\Actions\BulkAction::make(__('Reject all'))
+        ->color('danger')
+        ->icon('heroicon-o-x-circle')
+        ->requiresConfirmation()
+        ->deselectRecordsAfterCompletion()
+        ->action(fn(Collection $records) => $records->each->update(['status' => TalkStatus::Rejected])),
+])
+```
+
+I want to avoid to accept or reject a talk with status `Accepted` or `Rejected`. So I'm adding a condition to the table 
+to allow the selection of only submitted talk.
+
+```php
+//...
+->selectCurrentPageOnly() //limits the selection to the current visible page
+->checkIfRecordIsSelectableUsing(
+    fn(Talk $record): bool => $record->status === TalkStatus::Submitted,
+);
+```
+
+The result:
+![talk_table_bulk_actions.png](/docs/images/talk_table_bulk_actions.png)
+
+#### Column relationships - label
+
+You may use "dot notation" to access columns within relationships. The name of the relationship comes first, followed 
+by a period, followed by the name of the column to display:
+
+```php
+Tables\Columns\TextColumn::make('speaker.firstname')
+```
+
+We want display name and last name of the speaker in the Talk table, so we can use an `Attribute` in the model and 
+then access it in the column definition.
+
+`Speaker.php`
+```php
+    /**
+     * @return Attribute<Speaker, String> the full name of the speaker
+     */
+    public function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->first_name . ' ' . $this->last_name,
+        );
+    }
+```
+
+and then in table definition:
+
+```php
+Tables\Columns\TextColumn::make('speaker.fullName')
+```
+
+(In some cases, can be better to use `virtual columns` in the database)
+
+##### Searchable columns
+
+You can make a column searchable by using the `searchable()`. The method also accepts, for relationships columns, a
+list of columns to search.
+
+For the Speaker we want to search by first name and last name:
+```php
+Tables\Columns\TextColumn::make('speaker.fullName')
+    ->searchable(['first_name', 'last_name']),
+```
+
+The result of the relationship column:
+![talk_table_speaker_fullname.png](/docs/images/talk_table_speaker_fullname.png)
