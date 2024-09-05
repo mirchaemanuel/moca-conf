@@ -1116,3 +1116,83 @@ overriding the method `isReadOnly` in the `TalksRelationManager` class.
         return $conference->status !== ConferenceStatus::Draft;    
     }
 ```
+
+### 12 Filament - View Page
+
+In this stage, I'm creating the view page for the Talk resource. The view page is a read-only page that displays the
+details of a single record. The view page is useful for displaying detailed information about a record.
+
+Filament allows you to create completely custom pages for the app with the command `php artisan make:filament-page`.
+
+I've created the view page for the Talk resource with the following command:
+
+```
+> php artisan make:filament-page
+
+ ┌ What is the page name? ──────────────────────────────────────┐
+ │ ViewTalk                                                     │
+ └──────────────────────────────────────────────────────────────┘
+
+ ┌ Which resource would you like to create this in? ────────────┐
+ │ Talk                                                         │
+ └──────────────────────────────────────────────────────────────┘
+
+ ┌ Which type of page would you like to create? ────────────────┐
+ │ View                                                         │
+ └──────────────────────────────────────────────────────────────┘
+
+   INFO  Filament page [app/Filament/Resources/TalkResource/Pages/ViewTalk.php] created successfully.  
+
+   INFO  Make sure to register the page in `TalkResource::getPages()`.  
+```
+
+Then I registered the page in the `getPages()` method of the `TalkResource`:
+
+```php
+    public static function getPages(): array
+    {
+        return [
+            'index'  => Pages\ListTalks::route('/'),
+            'create' => Pages\CreateTalk::route('/create'),
+            'edit'   => Pages\EditTalk::route('/{record}/edit'),
+            'view'   => Pages\ViewTalk::route('/{record}'),
+        ];
+    }
+```
+
+Then I registered the action `ViewAction` to the table:
+
+```php
+ ->actions([
+     ActionGroup::make([
+         Tables\Actions\EditAction::make(),
+         Tables\Actions\ViewAction::make(),
+         //...
+```
+
+The ViewPage is ready. It is just the read-only page with the details of the Talk record. I'd prefer to customize the
+page with Infolist Builder of Filament.
+
+#### Infolist Builder
+
+Filament's infolist package allows you to render a read-only list of data about a particular entity. It's also used 
+within other Filament packages, such as the Panel Builder for displaying app resources and relation managers, as well as
+for action modals.
+
+For more information: [Filament Infolist Builder](https://filamentphp.com/docs/3.x/infolists/getting-started)
+
+First of all, we need to override the method `infolist` of the resource and then fill the schema with the fields we want
+to display.
+
+```php
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                //...
+            ]);
+    }
+```
+
+The result is:
+![talk_view_01.png](/docs/images/talk_view_01.png)

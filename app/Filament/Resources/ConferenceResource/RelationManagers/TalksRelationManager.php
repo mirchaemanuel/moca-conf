@@ -69,7 +69,10 @@ class TalksRelationManager extends RelationManager
                     ->recordSelectOptionsQuery(fn(Builder $query) => $query->whereStatus(TalkStatus::Accepted)),
             ])
             ->actions([
-                Tables\Actions\DetachAction::make()->requiresConfirmation(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DetachAction::make()->requiresConfirmation(),
+                ]),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

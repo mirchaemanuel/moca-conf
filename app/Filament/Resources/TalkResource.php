@@ -9,6 +9,12 @@ use App\Models\Speaker;
 use App\Models\Talk;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Fieldset;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
@@ -151,6 +157,7 @@ class TalkResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make(),
 
                     // accept a submitted talk
                     Tables\Actions\Action::make('Accept')
@@ -207,6 +214,69 @@ class TalkResource extends Resource
             );
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make(__('Speaker Information'))
+                    ->columns(2)
+                    ->schema([
+                        ImageEntry::make('speaker.avatar')
+                            ->label('')
+                            ->height(120)
+                            ->circular(),
+                        Group::make()
+                            ->schema([
+                                TextEntry::make('speaker.full_name_with_nick')
+                                    ->label(__('Speaker')),
+                                TextEntry::make('speaker.email')
+                                    ->label(__('Email')),
+                                TextEntry::make('speaker.phone')
+                                    ->label(__('Phone')),
+                                TextEntry::make('speaker.country')
+                                    ->label(__('Country')),
+                            ])->columns(2),
+                        Fieldset::make(__('Biography'))
+                            ->schema([
+                                TextEntry::make('speaker.bio')
+                                    ->label('')
+                                    ->markdown()
+                                    ->prose()
+                                    ->columnSpanFull(),
+                            ])->columnSpanFull(),
+                    ]),
+                Section::make(__('Talk Information'))
+                    ->columns(3)
+                    ->schema([
+                        TextEntry::make('title')
+                            ->label(__('Title'))
+                            ->columnSpan(2),
+                        TextEntry::make('status')
+                            ->translateLabel(),
+                        TextEntry::make('talkCategory.name')
+                            ->label(__('Category')),
+                        TextEntry::make('type')
+                            ->translateLabel(),
+                        TextEntry::make('duration')
+                            ->icon('heroicon-o-clock')
+                            ->translateLabel()
+                            ->suffix(' min'),
+                        TextEntry::make('abstract')
+                            ->translateLabel()
+                            ->columnSpanFull(),
+                        Fieldset::make(__('Description'))
+                            ->schema([
+                                TextEntry::make('description')
+                                    ->label('')
+                                    ->markdown()
+                                    ->prose()
+                                    ->columnSpanFull(),
+                            ])->columnSpanFull(),
+
+                    ]),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -220,6 +290,7 @@ class TalkResource extends Resource
             'index'  => Pages\ListTalks::route('/'),
             'create' => Pages\CreateTalk::route('/create'),
             'edit'   => Pages\EditTalk::route('/{record}/edit'),
+            'view'   => Pages\ViewTalk::route('/{record}'),
         ];
     }
 }
