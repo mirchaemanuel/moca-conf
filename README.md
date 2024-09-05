@@ -983,3 +983,5 @@ Tables\Columns\TextColumn::make('speaker.fullName')
     ->searchable(['first_name', 'last_name']),
 ```
 
+The result of the relationship column:
+![talk_table_speaker_fullname.png](/docs/images/talk_table_speaker_fullname.png)
