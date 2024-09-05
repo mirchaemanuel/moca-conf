@@ -194,6 +194,7 @@ class TalkResource extends Resource
                 ])
 
             ])
+            ->recordUrl(fn(Talk $record) => route('filament.admin.resources.talks.edit', compact('record')))
             ->bulkActions([
                 Tables\Actions\BulkAction::make(__('Accept all'))
                     ->color('success')

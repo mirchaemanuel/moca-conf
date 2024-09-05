@@ -1196,3 +1196,31 @@ to display.
 
 The result is:
 ![talk_view_01.png](/docs/images/talk_view_01.png)
+
+#### Reuse info list in the view page
+
+You may decide that you want a resource's form and table to be identical to a relation manager's, and subsequently want 
+to reuse the code you previously wrote. This is easy, by calling the form() and table() methods of the resource from the 
+relation manager.
+
+We can do the same with infolist to allow a modal view of the talk in the relation manager.
+
+In `Conference\TaskRelationManager.php` I added this method call:
+
+```php
+    public function infolist(Infolist $infolist): Infolist
+    {
+        return TalkResource::infolist($infolist);
+    }
+```
+
+and added a `ViewAction` in the table to open the modal:
+
+```php
+ ->actions([
+     Tables\Actions\ViewAction::make(),
+     //...
+```
+
+The result is:
+![conference_talk_relation_table_talkview.png](/docs/images/conference_talk_relation_table_talkview.png)
