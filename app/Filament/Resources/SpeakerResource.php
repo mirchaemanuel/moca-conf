@@ -17,6 +17,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn\TextColumnSize;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Str;
 
 class SpeakerResource extends Resource
@@ -172,6 +173,12 @@ class SpeakerResource extends Resource
                     ->preload()
                     ->options(
                         Countries::getList(app()->getLocale())
+                    ),
+                Tables\Filters\Filter::make('has_accepted_talks')
+                    ->translateLabel()
+                    ->toggle()
+                    ->query(
+                        fn(Builder $query) => $query->whereHas('acceptedTalks'),
                     ),
             ])
             ->actions([
