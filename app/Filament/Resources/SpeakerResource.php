@@ -30,83 +30,85 @@ class SpeakerResource extends Resource
         return $form
             ->schema([
 
-                Forms\Components\Section::make(__('General Information'))
-                    ->icon('heroicon-o-user-circle')
-                    ->columns(2)
-                    ->schema([
-                        Split::make([
-                            Section::make([
-                                Forms\Components\TextInput::make('first_name')
-                                    ->required(),
-                                Forms\Components\TextInput::make('last_name')
-                                    ->required(),
-                                Forms\Components\TextInput::make('nickname'),
-                                Forms\Components\Select::make('country')
-                                    ->placeholder(__('Select a country'))
-                                    ->searchable()
-                                    ->options(
-                                        Countries::getList(app()->getLocale())
-                                    ),
-                            ])->columns(2),
-                            Section::make([
-                                FileUpload::make('avatar')
-                                    ->avatar()
-                                    ->directory('avatars')
-                                    ->imageEditor()
-                                    ->maxSize(1024 * 1024 * 10)
+                Forms\Components\Tabs::make('Tabs')
+                    ->columnSpanFull()
+                    ->tabs([
+
+                        Forms\Components\Tabs\Tab::make(__('General Information'))
+                            ->icon('heroicon-o-user-circle')
+                            ->schema([
+                                Split::make([
+                                    Section::make([
+                                        Forms\Components\TextInput::make('first_name')
+                                            ->required(),
+                                        Forms\Components\TextInput::make('last_name')
+                                            ->required(),
+                                        Forms\Components\TextInput::make('nickname'),
+                                        Forms\Components\Select::make('country')
+                                            ->placeholder(__('Select a country'))
+                                            ->searchable()
+                                            ->options(
+                                                Countries::getList(app()->getLocale())
+                                            ),
+                                    ])->columns(2),
+                                    Section::make([
+                                        FileUpload::make('avatar')
+                                            ->avatar()
+                                            ->directory('avatars')
+                                            ->imageEditor()
+                                            ->maxSize(1024 * 1024 * 10)
+                                            ->columnSpanFull(),
+                                    ])->grow(false),
+                                ])
+                                    ->from('md')
                                     ->columnSpanFull(),
-                            ])->grow(false),
-                        ])
-                            ->from('md')
-                            ->columnSpanFull(),
 
-                        Forms\Components\MarkdownEditor::make('bio')
-                            ->disableToolbarButtons([
-                                'attachFiles',
-                            ])
-                            ->columnSpanFull(),
-                    ]),
-                Forms\Components\Section::make(__('Job Information'))
-                    ->icon('heroicon-s-briefcase')
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\TextInput::make('company'),
-                        Forms\Components\TextInput::make('job_title'),
-                    ]),
-                Forms\Components\Section::make(__('Contacts'))
-                    ->icon('heroicon-o-device-phone-mobile')
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\TextInput::make('email')
-                            ->email(),
-                        Forms\Components\TextInput::make('phone')
-                            ->tel(),
-                    ]),
-                Forms\Components\Section::make(__('Social'))
-                    ->icon('bi-link-45deg')
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\TextInput::make('linkedin')
-                            ->prefixicon('bi-linkedin')
-                            ->url(),
-                        Forms\Components\TextInput::make('twitter')
-                            ->prefixicon('bi-twitter-x')
-                            ->url(),
-                        Forms\Components\TextInput::make('facebook')
-                            ->prefixicon('bi-facebook')
-                            ->url(),
-                        Forms\Components\TextInput::make('instagram')
-                            ->prefixicon('bi-instagram')
-                            ->url(),
-                    ]),
-                Forms\Components\Section::make(__('Internal Information'))
-                    ->icon('heroicon-o-ellipsis-horizontal')
-                    ->columns(1)
-                    ->schema([
-                        Forms\Components\Textarea::make('notes')
-                            ->columnSpanFull(),
-                    ]),
+                                Forms\Components\MarkdownEditor::make('bio')
+                                    ->disableToolbarButtons([
+                                        'attachFiles',
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
+                        Forms\Components\Tabs\Tab::make(__('Job Information'))
+                            ->icon('heroicon-s-briefcase')
+                            ->schema([
+                                Forms\Components\TextInput::make('company'),
+                                Forms\Components\TextInput::make('job_title'),
+                            ]),
 
+                        Forms\Components\Tabs\Tab::make(__('Contacts'))
+                            ->icon('heroicon-o-device-phone-mobile')
+                            ->schema([
+                                Forms\Components\TextInput::make('email')
+                                    ->email(),
+                                Forms\Components\TextInput::make('phone')
+                                    ->tel(),
+                            ]),
+
+                        Forms\Components\Tabs\Tab::make(__('Social'))
+                            ->icon('bi-link-45deg')
+                            ->schema([
+                                Forms\Components\TextInput::make('linkedin')
+                                    ->prefixicon('bi-linkedin')
+                                    ->url(),
+                                Forms\Components\TextInput::make('twitter')
+                                    ->prefixicon('bi-twitter-x')
+                                    ->url(),
+                                Forms\Components\TextInput::make('facebook')
+                                    ->prefixicon('bi-facebook')
+                                    ->url(),
+                                Forms\Components\TextInput::make('instagram')
+                                    ->prefixicon('bi-instagram')
+                                    ->url(),
+                            ]),
+
+                        Forms\Components\Tabs\Tab::make(__('Internal Information'))
+                            ->icon('heroicon-o-ellipsis-horizontal')
+                            ->schema([
+                                Forms\Components\Textarea::make('notes')
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
 
             ]);
     }
