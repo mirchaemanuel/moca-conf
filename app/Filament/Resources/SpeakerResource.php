@@ -11,7 +11,9 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Split;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontFamily;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn\TextColumnSize;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -115,19 +117,19 @@ class SpeakerResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->height(120)
                     ->circular(),
-                Tables\Columns\TextColumn::make('first_name')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('last_name')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('nickname')
+                Tables\Columns\TextColumn::make('full_name')
+                    ->description(fn(Speaker $record): string => $record->nickname ?? '')
+                    ->label(__('Name'))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('country')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->copyable()
+                    ->copyMessage(__('Copied to clipboard'))
+                    ->copyMessageDuration(1000)
+                    ->toggleable()
+                    ->fontFamily(FontFamily::Mono)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -138,6 +140,15 @@ class SpeakerResource extends Resource
                 Tables\Columns\TextColumn::make('job_title')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('acceptedTalks.title')
+                    ->translateLabel()
+                    ->bulleted()
+                    ->weight('medium')
+                    ->size(TextColumnSize::ExtraSmall)
+                    ->listWithLineBreaks()
+                    ->limitList(2)
+                    ->expandableLimitedList()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -4,6 +4,8 @@ IT IS JUST A DEMO PROJECT FOR THE SPEECH
 
 IT IS STILL UNDER ACTIVE DEVELOPMENT
 
+IT IS NOT THE STATE OF THE ART OF FILAMENT USAGE. THE PURPOSE IS TO INTRODUCE FILAMENT.
+
 ## What is it?
 
 Welcome to the moca-conf application repository! This application is designed to help organize conferences, manage  
@@ -181,7 +183,6 @@ If you run the database seeders, you don't need to create a new user.
 
 Now you can access the Filament admin panel at `/admin`.
 
-  
 ### 04: Filament - Resources  
 
 In this stage, we will create the following resources:
@@ -706,7 +707,6 @@ Tables\Columns\TextColumn::make('status')
 The result of the table is:
 ![ConferenceResource_table_08.png](/docs/images/ConferenceResource_table_08.png)
 
-
 ### 09 Filament - Speaker Resource
 
 In this stage, I'm applying the form inputs and table builder to the Speaker resource. The Speaker resource is the most
@@ -989,7 +989,6 @@ Tables\Columns\TextColumn::make('speaker.fullName')
 
 The result of the relationship column:
 ![talk_table_speaker_fullname.png](/docs/images/talk_table_speaker_fullname.png)
-
 
 ### 11 Filament - Managing Relationships
 

@@ -23,6 +23,14 @@ class Speaker extends Model
     }
 
     /**
+     * @return HasMany<Talk> the talks given by this speaker that have been accepted
+     */
+    public function acceptedTalks(): HasMany
+    {
+        return $this->talks()->where('status', 'accepted');
+    }
+
+    /**
      * @return Attribute<Speaker, String> the full name of the speaker
      */
     protected function fullName(): Attribute
