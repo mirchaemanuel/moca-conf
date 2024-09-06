@@ -1223,3 +1223,82 @@ and added a `ViewAction` in the table to open the modal:
 
 The result is:
 ![conference_talk_relation_table_talkview.png](/docs/images/conference_talk_relation_table_talkview.png)
+
+
+### 13 Tyding Up - Tables and Forms
+
+In this stage, I'm tidying up the tables and forms of the resources applying some advanced features of Filament.
+
+#### Spekaer Resource
+
+##### Table
+
+I've added the list of accepted talk as column in the Speaker table. The column is a relationship column with the `Talk`
+model. The column has some interesting features: it is showing a bulleted list of the talks and it is expandable.
+
+```php
+Tables\Columns\TextColumn::make('acceptedTalks.title')
+    ->translateLabel()
+    ->bulleted()
+    ->weight('medium')
+    ->size(TextColumnSize::ExtraSmall)
+    ->listWithLineBreaks()
+    ->limitList(2)
+    ->expandableLimitedList()
+    ->toggleable(),
+```
+
+I added `copyable` method to `email` column, so the user can copy the email address with a click.
+
+```php
+ Tables\Columns\TextColumn::make('email')
+     ->copyable()
+     ->copyMessage(__('Copied to clipboard'))
+     ->copyMessageDuration(1000)
+     ->toggleable()
+     ->fontFamily(FontFamily::Mono)
+     ->searchable(),
+```
+
+I added a flag icon to the `country` column and the tooltip with the country name.
+
+For the icon I've installed this package `outhebox/blade-flags`:
+
+```bash
+composer install outhebox/blade-flags
+```
+
+and then I used the `icon` method to add the flag icon:
+
+```php
+ Tables\Columns\TextColumn::make('country')
+     ->icon(fn(Speaker $record) => $record->country === null ? '' : 'flag-country-' . Str::lower($record->country))
+     ->iconPosition(IconPosition::After)
+     ->tooltip(fn(Speaker $record) => $record->country === null ? '' : Countries::getOne($record->country))
+     ->sortable() 
+```
+
+###### Custom Filter
+
+I've added a toggle filter to show only speakers with accepted talks.
+
+First of all I've added a new attribute to Spaker model:
+
+```php
+ protected function hasAcceptedTalks(): Attribute
+ {
+     return Attribute::make(
+         get: fn () => $this->acceptedTalks()->exists(),
+     );
+ }
+```
+and then I've added the filter to the table:
+
+```php
+ Tables\Filters\Filter::make('has_accepted_talks')
+     ->translateLabel()
+     ->toggle()
+     ->query(
+         fn(Builder $query) => $query->whereHas('acceptedTalks'),
+     ),
+```
