@@ -1302,3 +1302,13 @@ and then I've added the filter to the table:
          fn(Builder $query) => $query->whereHas('acceptedTalks'),
      ),
 ```
+
+Here is the result:
+![speaker_table_flag_and_filter_01.png](/docs/images/speaker_table_flag_and_filter_01.png)
+
+##### Form
+
+I've reordered the Speaker form and converted to a Tabbed layout:
+![speaker_form_tabbed_layout_01.png](/docs/images/speaker_form_tabbed_layout_01.png)
+
+For more information about advanced layouts: [Filament Form Builder - Layouts](https://filamentphp.com/docs/3.x/forms/layout/getting-started)
