@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SpeakerResource\Pages;
+use App\Filament\Resources\SpeakerResource\RelationManagers\TalksRelationManager;
 use App\Models\Speaker;
 use Countries;
 use Filament\Forms;
@@ -192,7 +193,7 @@ class SpeakerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            TalksRelationManager::class,
         ];
     }
 
