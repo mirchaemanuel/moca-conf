@@ -12,10 +12,12 @@ use Filament\Forms\Components\Split;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontFamily;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn\TextColumnSize;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Str;
 
 class SpeakerResource extends Resource
 {
@@ -123,6 +125,9 @@ class SpeakerResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('country')
+                    ->icon(fn(Speaker $record) => $record->country === null ? '' : 'flag-country-' . Str::lower($record->country))
+                    ->iconPosition(IconPosition::After)
+                    ->tooltip(fn(Speaker $record) => $record->country === null ? '' : Countries::getOne($record->country))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->copyable()
