@@ -73,6 +73,7 @@ class SpeakerResource extends Resource
                             ]),
                         Forms\Components\Tabs\Tab::make(__('Job Information'))
                             ->icon('heroicon-s-briefcase')
+                            ->columns(2)
                             ->schema([
                                 Forms\Components\TextInput::make('company'),
                                 Forms\Components\TextInput::make('job_title'),
@@ -80,6 +81,7 @@ class SpeakerResource extends Resource
 
                         Forms\Components\Tabs\Tab::make(__('Contacts'))
                             ->icon('heroicon-o-device-phone-mobile')
+                            ->columns(2)
                             ->schema([
                                 Forms\Components\TextInput::make('email')
                                     ->email(),
@@ -89,6 +91,7 @@ class SpeakerResource extends Resource
 
                         Forms\Components\Tabs\Tab::make(__('Social'))
                             ->icon('bi-link-45deg')
+                            ->columns(2)
                             ->schema([
                                 Forms\Components\TextInput::make('linkedin')
                                     ->prefixicon('bi-linkedin')
