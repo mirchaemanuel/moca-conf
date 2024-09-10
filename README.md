@@ -1312,3 +1312,13 @@ I've reordered the Speaker form and converted to a Tabbed layout:
 ![speaker_form_tabbed_layout_01.png](/docs/images/speaker_form_tabbed_layout_01.png)
 
 For more information about advanced layouts: [Filament Form Builder - Layouts](https://filamentphp.com/docs/3.x/forms/layout/getting-started)
+
+##### Seeder
+
+I've improved the `SpeakerFactory` to add a random avatar image to the speaker.
+
+If you'd like to see the new data, you can run a new migration and seed with `mc:demo` command:
+
+```bash
+php artisan mc:demo
+```
