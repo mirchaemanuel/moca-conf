@@ -1313,7 +1313,13 @@ I've reordered the Speaker form and converted to a Tabbed layout:
 
 For more information about advanced layouts: [Filament Form Builder - Layouts](https://filamentphp.com/docs/3.x/forms/layout/getting-started)
 
-##### Seeder
+##### Talks Relation Manager
+
+I've added `TalksRelationManager` to `SpeakerResource` to manage the talks of the speaker. The relation manager has a
+table with the list of talks owned by the speaker and a `CrateAction` to create a new talk directly from the relation
+manager.
+
+#### Seeder
 
 I've improved the `SpeakerFactory` to add a random avatar image to the speaker.
 

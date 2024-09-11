@@ -6,6 +6,7 @@ use App\Enums\ConferenceStatus;
 use App\Enums\TalkStatus;
 use App\Filament\Resources\TalkResource;
 use App\Models\Conference;
+use App\Models\Talk;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
@@ -50,6 +51,11 @@ class TalksRelationManager extends RelationManager
                     ->suffix(' min')
                     ->icon('heroicon-o-clock')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->tooltip(fn(Talk $record) => $record->type->getDescription())
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('date_time')
                     ->dateTime()
                     ->sortable(),

@@ -63,6 +63,9 @@ class TalksRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                Tables\Actions\CreateAction::make()->form(
+                    TalkResource::getForm($speaker)
+                )
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -73,6 +76,11 @@ class TalksRelationManager extends RelationManager
             ->bulkActions([
 
             ]);
+    }
+
+    public function isReadOnly(): bool
+    {
+        return false;
     }
 
     public function infolist(Infolist $infolist): Infolist
