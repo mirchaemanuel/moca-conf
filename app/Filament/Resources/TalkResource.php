@@ -9,6 +9,7 @@ use App\Models\Speaker;
 use App\Models\Talk;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Component as InfolistsComponent;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\ImageEntry;
@@ -246,36 +247,41 @@ class TalkResource extends Resource
                                     ->columnSpanFull(),
                             ])->columnSpanFull(),
                     ]),
-                Section::make(__('Talk Information'))
-                    ->columns(3)
-                    ->schema([
-                        TextEntry::make('title')
-                            ->label(__('Title'))
-                            ->columnSpan(2),
-                        TextEntry::make('status')
-                            ->translateLabel(),
-                        TextEntry::make('talkCategory.name')
-                            ->label(__('Category')),
-                        TextEntry::make('type')
-                            ->translateLabel(),
-                        TextEntry::make('duration')
-                            ->icon('heroicon-o-clock')
-                            ->translateLabel()
-                            ->suffix(' min'),
-                        TextEntry::make('abstract')
-                            ->translateLabel()
-                            ->columnSpanFull(),
-                        Fieldset::make(__('Description'))
-                            ->schema([
-                                TextEntry::make('description')
-                                    ->label('')
-                                    ->markdown()
-                                    ->prose()
-                                    ->columnSpanFull(),
-                            ])->columnSpanFull(),
-
-                    ]),
+                    self::talkInformationInfolistSection(),
             ]);
+    }
+
+    public static function talkInformationInfolistSection(): InfolistsComponent
+    {
+        return
+            Section::make(__('Talk Information'))
+                ->columns(3)
+                ->schema([
+                    TextEntry::make('title')
+                        ->label(__('Title'))
+                        ->columnSpan(2),
+                    TextEntry::make('status')
+                        ->translateLabel(),
+                    TextEntry::make('talkCategory.name')
+                        ->label(__('Category')),
+                    TextEntry::make('type')
+                        ->translateLabel(),
+                    TextEntry::make('duration')
+                        ->icon('heroicon-o-clock')
+                        ->translateLabel()
+                        ->suffix(' min'),
+                    TextEntry::make('abstract')
+                        ->translateLabel()
+                        ->columnSpanFull(),
+                    Fieldset::make(__('Description'))
+                        ->schema([
+                            TextEntry::make('description')
+                                ->label('')
+                                ->markdown()
+                                ->prose()
+                                ->columnSpanFull(),
+                        ])->columnSpanFull(),
+                ]);
     }
 
     public static function getRelations(): array

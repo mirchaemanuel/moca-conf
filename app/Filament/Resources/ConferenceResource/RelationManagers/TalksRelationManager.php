@@ -37,7 +37,7 @@ class TalksRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('title')
             ->columns([
-                Tables\Columns\TextColumn::make('speaker.fullName')
+                Tables\Columns\TextColumn::make('speaker.full_name')
                     ->searchable(['first_name', 'last_name'])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('talkCategory.name')
@@ -68,11 +68,13 @@ class TalksRelationManager extends RelationManager
                             ->maxDate($conference->end_date)
                             ->required(),
                     ])
+                    ->disabled(fn() => !$this->isEditable())
                     ->recordSelectOptionsQuery(fn(Builder $query) => $query->whereStatus(TalkStatus::Accepted)),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DetachAction::make()->requiresConfirmation(),
+                    Tables\Actions\DetachAction::make()->requiresConfirmation()
+                        ->disabled(fn() => !$this->isEditable()),
                     Tables\Actions\ViewAction::make(),
                 ]),
 
@@ -84,15 +86,17 @@ class TalksRelationManager extends RelationManager
             ]);
     }
 
+
     public function infolist(Infolist $infolist): Infolist
     {
         return TalkResource::infolist($infolist);
     }
 
-    public function isReadOnly(): bool
+    public function isEditable(): bool
     {
         /** @var \App\Models\Conference $conference */
         $conference = $this->getOwnerRecord();
-        return $conference->status !== ConferenceStatus::Draft;
+        return $conference->status === ConferenceStatus::Draft;
     }
+
 }

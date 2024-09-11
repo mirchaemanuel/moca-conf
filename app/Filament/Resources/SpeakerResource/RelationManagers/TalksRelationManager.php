@@ -79,35 +79,7 @@ class TalksRelationManager extends RelationManager
     {
         return $infolist
             ->schema([
-                Section::make(__('Talk Information'))
-                    ->columns(3)
-                    ->schema([
-                        TextEntry::make('title')
-                            ->label(__('Title'))
-                            ->columnSpan(2),
-                        TextEntry::make('status')
-                            ->translateLabel(),
-                        TextEntry::make('talkCategory.name')
-                            ->label(__('Category')),
-                        TextEntry::make('type')
-                            ->translateLabel(),
-                        TextEntry::make('duration')
-                            ->icon('heroicon-o-clock')
-                            ->translateLabel()
-                            ->suffix(' min'),
-                        TextEntry::make('abstract')
-                            ->translateLabel()
-                            ->columnSpanFull(),
-                        Fieldset::make(__('Description'))
-                            ->schema([
-                                TextEntry::make('description')
-                                    ->label('')
-                                    ->markdown()
-                                    ->prose()
-                                    ->columnSpanFull(),
-                            ])->columnSpanFull(),
-
-                    ]),
+                TalkResource::talkInformationInfolistSection()
             ]);
     }
 }
