@@ -1229,7 +1229,7 @@ The result is:
 
 In this stage, I'm tidying up the tables and forms of the resources applying some advanced features of Filament.
 
-#### Spekaer Resource
+#### Speaker Resource
 
 ##### Table
 
