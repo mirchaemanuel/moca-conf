@@ -23,6 +23,14 @@ class Speaker extends Model
     }
 
     /**
+     * @return HasMany<Talk> the talks given by this speaker that have been accepted
+     */
+    public function acceptedTalks(): HasMany
+    {
+        return $this->talks()->where('status', 'accepted');
+    }
+
+    /**
      * @return Attribute<Speaker, String> the full name of the speaker
      */
     protected function fullName(): Attribute
@@ -39,6 +47,16 @@ class Speaker extends Model
     {
         return Attribute::make(
             get: fn () => $this->first_name . ' ' . $this->last_name . ' (' . $this->nickname . ')',
+        );
+    }
+
+    /**
+     * @return Attribute<Speaker, Boolean> whether the speaker has accepted talks
+     */
+    protected function hasAcceptedTalks(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->acceptedTalks()->exists(),
         );
     }
 }

@@ -4,6 +4,8 @@ IT IS JUST A DEMO PROJECT FOR THE SPEECH
 
 IT IS STILL UNDER ACTIVE DEVELOPMENT
 
+IT IS NOT THE STATE OF THE ART OF FILAMENT USAGE. THE PURPOSE IS TO INTRODUCE FILAMENT.
+
 ## What is it?
 
 Welcome to the moca-conf application repository! This application is designed to help organize conferences, manage  
@@ -181,7 +183,6 @@ If you run the database seeders, you don't need to create a new user.
 
 Now you can access the Filament admin panel at `/admin`.
 
-  
 ### 04: Filament - Resources  
 
 In this stage, we will create the following resources:
@@ -706,7 +707,6 @@ Tables\Columns\TextColumn::make('status')
 The result of the table is:
 ![ConferenceResource_table_08.png](/docs/images/ConferenceResource_table_08.png)
 
-
 ### 09 Filament - Speaker Resource
 
 In this stage, I'm applying the form inputs and table builder to the Speaker resource. The Speaker resource is the most
@@ -990,7 +990,6 @@ Tables\Columns\TextColumn::make('speaker.fullName')
 The result of the relationship column:
 ![talk_table_speaker_fullname.png](/docs/images/talk_table_speaker_fullname.png)
 
-
 ### 11 Filament - Managing Relationships
 
 In this stage, I'm managing the relationships between the resources. The Talk resource has a many-to-many relationship
@@ -1224,3 +1223,108 @@ and added a `ViewAction` in the table to open the modal:
 
 The result is:
 ![conference_talk_relation_table_talkview.png](/docs/images/conference_talk_relation_table_talkview.png)
+
+
+### 13 Tyding Up - Tables and Forms
+
+In this stage, I'm tidying up the tables and forms of the resources applying some advanced features of Filament.
+
+#### Speaker Resource
+
+##### Table
+
+I've added the list of accepted talk as column in the Speaker table. The column is a relationship column with the `Talk`
+model. The column has some interesting features: it is showing a bulleted list of the talks and it is expandable.
+
+```php
+Tables\Columns\TextColumn::make('acceptedTalks.title')
+    ->translateLabel()
+    ->bulleted()
+    ->weight('medium')
+    ->size(TextColumnSize::ExtraSmall)
+    ->listWithLineBreaks()
+    ->limitList(2)
+    ->expandableLimitedList()
+    ->toggleable(),
+```
+
+I added `copyable` method to `email` column, so the user can copy the email address with a click.
+
+```php
+ Tables\Columns\TextColumn::make('email')
+     ->copyable()
+     ->copyMessage(__('Copied to clipboard'))
+     ->copyMessageDuration(1000)
+     ->toggleable()
+     ->fontFamily(FontFamily::Mono)
+     ->searchable(),
+```
+
+I added a flag icon to the `country` column and the tooltip with the country name.
+
+For the icon I've installed this package `outhebox/blade-flags`:
+
+```bash
+composer install outhebox/blade-flags
+```
+
+and then I used the `icon` method to add the flag icon:
+
+```php
+ Tables\Columns\TextColumn::make('country')
+     ->icon(fn(Speaker $record) => $record->country === null ? '' : 'flag-country-' . Str::lower($record->country))
+     ->iconPosition(IconPosition::After)
+     ->tooltip(fn(Speaker $record) => $record->country === null ? '' : Countries::getOne($record->country))
+     ->sortable() 
+```
+
+###### Custom Filter
+
+I've added a toggle filter to show only speakers with accepted talks.
+
+First of all I've added a new attribute to Spaker model:
+
+```php
+ protected function hasAcceptedTalks(): Attribute
+ {
+     return Attribute::make(
+         get: fn () => $this->acceptedTalks()->exists(),
+     );
+ }
+```
+and then I've added the filter to the table:
+
+```php
+ Tables\Filters\Filter::make('has_accepted_talks')
+     ->translateLabel()
+     ->toggle()
+     ->query(
+         fn(Builder $query) => $query->whereHas('acceptedTalks'),
+     ),
+```
+
+Here is the result:
+![speaker_table_flag_and_filter_01.png](/docs/images/speaker_table_flag_and_filter_01.png)
+
+##### Form
+
+I've reordered the Speaker form and converted to a Tabbed layout:
+![speaker_form_tabbed_layout_01.png](/docs/images/speaker_form_tabbed_layout_01.png)
+
+For more information about advanced layouts: [Filament Form Builder - Layouts](https://filamentphp.com/docs/3.x/forms/layout/getting-started)
+
+##### Talks Relation Manager
+
+I've added `TalksRelationManager` to `SpeakerResource` to manage the talks of the speaker. The relation manager has a
+table with the list of talks owned by the speaker and a `CrateAction` to create a new talk directly from the relation
+manager.
+
+#### Seeder
+
+I've improved the `SpeakerFactory` to add a random avatar image to the speaker.
+
+If you'd like to see the new data, you can run a new migration and seed with `mc:demo` command:
+
+```bash
+php artisan mc:demo
+```

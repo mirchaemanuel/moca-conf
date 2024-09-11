@@ -6,6 +6,7 @@ use App\Models\Speaker;
 use App\Models\TalkCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Storage;
 
 class AddLocalSpeakerSeeder extends Seeder
 {
@@ -15,6 +16,10 @@ class AddLocalSpeakerSeeder extends Seeder
     public function run(): void
     {
         if (App::environment() === 'local' && Speaker::count() === 0) {
+
+            // Clear avatar images
+            Storage::deleteDirectory('public/avatars');
+
             // create a bunch of category
             TalkCategory::factory()->count(10)->create();
 
@@ -27,4 +32,6 @@ class AddLocalSpeakerSeeder extends Seeder
             Speaker::factory()->count(10)->create();
         }
     }
+
+
 }

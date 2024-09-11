@@ -7,8 +7,10 @@ use App\Enums\TalkType;
 use App\Filament\Resources\TalkResource\Pages;
 use App\Models\Speaker;
 use App\Models\Talk;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Component as InfolistsComponent;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\ImageEntry;
@@ -30,69 +32,7 @@ class TalkResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\Section::make(__('Base Information'))
-                    ->icon('heroicon-o-user-circle')
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\Select::make('speaker_id')
-                            ->relationship('speaker', 'id')
-                            ->searchable()
-                            ->preload()
-                            ->getOptionLabelFromRecordUsing(fn(Speaker $speaker): string => "{$speaker->first_name} {$speaker->last_name} ({$speaker->nickname})")
-                            ->required(),
-                        Forms\Components\TextInput::make('title')
-                            ->columnSpanFull()
-                            ->required(),
-                    ]),
-                Forms\Components\Section::make(__('Details'))
-                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\Textarea::make('abstract')
-                            ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\RichEditor::make('description')
-                            ->disableToolbarButtons([
-                                'attachFiles',
-                            ])
-                            ->required()
-                            ->columnSpanFull(),
-                    ]),
-
-                Forms\Components\Section::make(__('Characteristics'))
-                    ->icon('heroicon-o-ellipsis-horizontal-circle')
-                    ->columns(3)
-                    ->schema([
-                        Forms\Components\Select::make('talk_category_id')
-                            ->relationship('talkCategory', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        Forms\Components\Select::make('type')
-                            ->options(TalkType::class)
-                            ->native(false)
-                            ->required(),
-                        Forms\Components\TextInput::make('duration')
-                            ->prefixIcon('heroicon-o-clock')
-                            ->suffix(' min')
-                            ->required()
-                            ->integer()
-                            ->default(30),
-                    ]),
-                Forms\Components\Fieldset::make(__('Status'))
-                    ->schema([
-                        Forms\Components\Radio::make('status')
-                            ->label('')
-                            ->options(
-                                TalkStatus::class
-                            )
-                            ->required()
-                            ->columnSpanFull(),
-                    ]),
-
-
-            ]);
+            ->schema(self::getForm());
     }
 
     public static function table(Table $table): Table
@@ -246,36 +186,41 @@ class TalkResource extends Resource
                                     ->columnSpanFull(),
                             ])->columnSpanFull(),
                     ]),
-                Section::make(__('Talk Information'))
-                    ->columns(3)
-                    ->schema([
-                        TextEntry::make('title')
-                            ->label(__('Title'))
-                            ->columnSpan(2),
-                        TextEntry::make('status')
-                            ->translateLabel(),
-                        TextEntry::make('talkCategory.name')
-                            ->label(__('Category')),
-                        TextEntry::make('type')
-                            ->translateLabel(),
-                        TextEntry::make('duration')
-                            ->icon('heroicon-o-clock')
-                            ->translateLabel()
-                            ->suffix(' min'),
-                        TextEntry::make('abstract')
-                            ->translateLabel()
-                            ->columnSpanFull(),
-                        Fieldset::make(__('Description'))
-                            ->schema([
-                                TextEntry::make('description')
-                                    ->label('')
-                                    ->markdown()
-                                    ->prose()
-                                    ->columnSpanFull(),
-                            ])->columnSpanFull(),
-
-                    ]),
+                self::talkInformationInfolistSection(),
             ]);
+    }
+
+    public static function talkInformationInfolistSection(): InfolistsComponent
+    {
+        return
+            Section::make(__('Talk Information'))
+                ->columns(3)
+                ->schema([
+                    TextEntry::make('title')
+                        ->label(__('Title'))
+                        ->columnSpan(2),
+                    TextEntry::make('status')
+                        ->translateLabel(),
+                    TextEntry::make('talkCategory.name')
+                        ->label(__('Category')),
+                    TextEntry::make('type')
+                        ->translateLabel(),
+                    TextEntry::make('duration')
+                        ->icon('heroicon-o-clock')
+                        ->translateLabel()
+                        ->suffix(' min'),
+                    TextEntry::make('abstract')
+                        ->translateLabel()
+                        ->columnSpanFull(),
+                    Fieldset::make(__('Description'))
+                        ->schema([
+                            TextEntry::make('description')
+                                ->label('')
+                                ->markdown()
+                                ->prose()
+                                ->columnSpanFull(),
+                        ])->columnSpanFull(),
+                ]);
     }
 
     public static function getRelations(): array
@@ -292,6 +237,77 @@ class TalkResource extends Resource
             'create' => Pages\CreateTalk::route('/create'),
             'edit'   => Pages\EditTalk::route('/{record}/edit'),
             'view'   => Pages\ViewTalk::route('/{record}'),
+        ];
+    }
+
+    /**
+     * @return array<Forms\Components\Component>|Closure
+     */
+    public static function getForm(?Speaker $speaker = null): array|Closure
+    {
+        return [
+            Forms\Components\Section::make(__('Base Information'))
+                ->icon('heroicon-o-user-circle')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Select::make('speaker_id')
+                        ->relationship('speaker', 'id')
+                        ->searchable()
+                        ->preload()
+                        ->getOptionLabelFromRecordUsing(fn(Speaker $speaker): string => "{$speaker->first_name} {$speaker->last_name} ({$speaker->nickname})")
+                        ->required()
+                        ->hidden($speaker !== null),
+                    Forms\Components\TextInput::make('title')
+                        ->columnSpanFull()
+                        ->required(),
+                ]),
+            Forms\Components\Section::make(__('Details'))
+                ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Textarea::make('abstract')
+                        ->required()
+                        ->columnSpanFull(),
+                    Forms\Components\RichEditor::make('description')
+                        ->disableToolbarButtons([
+                            'attachFiles',
+                        ])
+                        ->required()
+                        ->columnSpanFull(),
+                ]),
+
+            Forms\Components\Section::make(__('Characteristics'))
+                ->icon('heroicon-o-ellipsis-horizontal-circle')
+                ->columns(3)
+                ->schema([
+                    Forms\Components\Select::make('talk_category_id')
+                        ->relationship('talkCategory', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    Forms\Components\Select::make('type')
+                        ->options(TalkType::class)
+                        ->native(false)
+                        ->required(),
+                    Forms\Components\TextInput::make('duration')
+                        ->prefixIcon('heroicon-o-clock')
+                        ->suffix(' min')
+                        ->required()
+                        ->integer()
+                        ->default(30),
+                ]),
+            Forms\Components\Fieldset::make(__('Status'))
+                ->schema([
+                    Forms\Components\Radio::make('status')
+                        ->label('')
+                        ->options(
+                            TalkStatus::class
+                        )
+                        ->required()
+                        ->columnSpanFull(),
+                ]),
+
+
         ];
     }
 }
