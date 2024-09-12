@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\TalkStatus;
 use App\Enums\TalkType;
 use App\Filament\Resources\TalkResource\Pages;
+use App\Filament\Resources\TalkResource\Widgets\TalkOverview;
 use App\Models\Speaker;
 use App\Models\Talk;
 use Closure;
@@ -310,4 +311,12 @@ class TalkResource extends Resource
 
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            TalkOverview::class,
+        ];
+    }
+
 }
