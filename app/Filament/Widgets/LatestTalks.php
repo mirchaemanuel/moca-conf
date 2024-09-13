@@ -18,23 +18,18 @@ class LatestTalks extends BaseWidget
     {
         return $table
             ->query(
-                TalkResource::getEloquentQuery()
+                TalkResource::getEloquentQuery()->latest()->limit(5)
             )
-            ->defaultPaginationPageOption(5)
             ->defaultSort('created_at', 'desc')
             ->searchable(false)
+            ->paginated(false)
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('speaker.fullName')
-                    ->searchable(['first_name', 'last_name'])
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
+                    ->dateTime(),
+                Tables\Columns\TextColumn::make('speaker.fullName'),
+                Tables\Columns\TextColumn::make('title'),
                 Tables\Columns\TextColumn::make('status')
-                    ->badge()
-                    ->sortable(),
+                    ->badge(),
             ])
             ->actions([
                 Tables\Actions\Action::make(__('View'))
