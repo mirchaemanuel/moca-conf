@@ -1328,3 +1328,85 @@ If you'd like to see the new data, you can run a new migration and seed with `mc
 ```bash
 php artisan mc:demo
 ```
+
+### 14 Filament - Widgets
+
+In this stage, I'm adding some widgets to the dashboard. Widgets are small, self-contained components that can be used to 
+display information or perform actions. Widgets can be added to the dashboard to provide users with quick access to
+important information or actions.
+
+Filament provides a wide range of widgets to choose from. Each widget has a set of methods that can be chained to customize
+the widget's behavior and appearance.
+
+For more information [Filament Dashboard - Widgets](https://filamentphp.com/docs/3.x/widgets/installation) and
+[Filament - Panel -> Widgets](https://filamentphp.com/docs/3.x/panels/resources/widgets)
+
+There are three main types of widgets (you can always create custom widgets):
+- Stats Overview
+- Chart
+- Table.
+
+Widgets are PHP class and can be created with the command `make:filament-widget`. The created widget must be registered in
+the `AdminPanelProvider` class.
+
+In a fresh Filament installation, the panel has these widgets:
+
+```php
+return $panel
+ // ...
+       ->widgets([
+            Widgets\AccountWidget::class,
+            Widgets\FilamentInfoWidget::class,
+       ])
+```
+
+![dashboard_widgets_00.png](/docs/images/dashboard_widgets_00.png)
+
+I've got rid of the demo `FilamentInfoWidget`.
+
+#### Resource Widgets
+
+Filament allows you to display widgets also inside pages, below the header and above the footer, creating widgets
+specifically for the resource.
+
+I've created a Stats Oveview resource widget, `TalkOverview`, with the following command:
+
+```bash
+php artisan make:filament-widget  TalkOverview --resource=TalkResource
+``` 
+
+Filament warns us to register the widget in the `TalkResource`:
+
+```php
+   INFO  Filament widget [app/Filament/Resources/TalkResource/Widgets/TalkOverview.php] created successfully.  
+
+   INFO  Make sure to register the widget in `TalkResource::getWidgets()`, and then again in `getHeaderWidgets()` or `getFooterWidgets()` of any `TalkResource` page.  
+```
+
+I've registered the widget in the `TalkResource`:
+
+```php
+    public static function getWidgets(): array
+    {
+        return [
+            Widgets\TalkOverview::class,
+        ];
+    }
+```
+
+and then I've added the widget to the `ListTalks` page:
+
+```php
+    public static function getHeaderWidgets(): array
+    {
+        return [
+            Widgets\TalkOverview::class,
+        ];
+    }
+```
+
+The result is:
+![talk_resource_widget_01.png](/docs/images/talk_resource_widget_01.png)
+
+The widget is dynamic and reacts to the filters and search of the table.
+
