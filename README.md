@@ -11,6 +11,8 @@ IT IS NOT THE STATE OF THE ART OF FILAMENT USAGE. THE PURPOSE IS TO INTRODUCE FI
 Welcome to the moca-conf application repository! This application is designed to help organize conferences, manage  
 speakers, and schedule programs using Laravel and Filament.
 
+The speech (in italian) is available here: https://www.youtube.com/watch?v=gzwwpjuYueg
+
 ## About the Talk
 
 This repository is part of my upcoming speech at [MOCA 2024](https://moca.camp), titled **"Rapid Application Development with Laravel and Filament"**.
